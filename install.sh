@@ -157,14 +157,28 @@ fetch_tree() {
   need_cmd git
   mkdir -p "$(dirname "$SRC_DIR")"
   if [[ -d "$SRC_DIR/.git" ]]; then
+    if ! git -C "$SRC_DIR" rev-parse HEAD >/dev/null 2>&1; then
+      log "corrupt git tree at $SRC_DIR — recloning"
+      rm -rf "$SRC_DIR"
+    fi
+  fi
+  if [[ -d "$SRC_DIR/.git" ]]; then
     log "updating $SRC_DIR"
-    git -C "$SRC_DIR" fetch origin "$REPO_BRANCH" 2>/dev/null || true
-    git -C "$SRC_DIR" checkout "$REPO_BRANCH" 2>/dev/null || true
-    git -C "$SRC_DIR" pull --ff-only origin "$REPO_BRANCH" 2>/dev/null || true
-  else
-    [[ -e "$SRC_DIR" ]] && die "$SRC_DIR exists but is not a git repo"
+    if ! git -C "$SRC_DIR" fetch origin "$REPO_BRANCH" 2>/dev/null || \
+       ! git -C "$SRC_DIR" checkout "$REPO_BRANCH" 2>/dev/null || \
+       ! git -C "$SRC_DIR" pull --ff-only origin "$REPO_BRANCH" 2>/dev/null; then
+      log "git update failed — recloning $SRC_DIR"
+      rm -rf "$SRC_DIR"
+    fi
+  fi
+  if [[ ! -d "$SRC_DIR/.git" ]]; then
+    [[ -e "$SRC_DIR" ]] && rm -rf "$SRC_DIR"
     log "cloning $REPO_URL → $SRC_DIR"
     git clone --branch "$REPO_BRANCH" "$REPO_URL" "$SRC_DIR"
+  fi
+  # Sanity: critical sources must be non-empty after update/clone
+  if [[ ! -s "$SRC_DIR/clients/findtwin.c" || ! -s "$SRC_DIR/server/wrapper.c" ]]; then
+    die "source tree looks empty/corrupt at $SRC_DIR — delete it and re-run"
   fi
 }
 
