@@ -68,6 +68,14 @@ static const char *tmpdir(void) {
   return "/tmp";
 }
 
+/* Linux and Termux have /proc; macOS does not. */
+static int have_procfs(void) {
+  static int cached = -1;
+  if (cached < 0)
+    cached = (access("/proc/self/stat", F_OK) == 0) ? 1 : 0;
+  return cached;
+}
+
 /* Linux /proc/<pid>/stat field tty_nr; 0 = no controlling terminal. -1 on error. */
 static int proc_tty_nr(pid_t pid) {
   char path[64], buf[512];
@@ -75,7 +83,7 @@ static int proc_tty_nr(pid_t pid) {
   int fd, n, tty = -1;
   char state;
 
-  if (pid <= 0)
+  if (!have_procfs() || pid <= 0)
     return -1;
   snprintf(path, sizeof path, "/proc/%d/stat", (int)pid);
   fd = open(path, O_RDONLY);
@@ -166,7 +174,7 @@ static int unix_path_inode(const char *path, unsigned long *out_ino) {
   FILE *f;
   char line[768];
 
-  if (!path || !out_ino)
+  if (!have_procfs() || !path || !out_ino)
     return -1;
   f = fopen("/proc/net/unix", "r");
   if (!f)
@@ -206,6 +214,8 @@ static pid_t sock_listener_pid(const char *path) {
   struct dirent *pe;
   pid_t found = (pid_t)-1;
 
+  if (!have_procfs())
+    return (pid_t)-1;
   if (unix_path_inode(path, &ino) != 0)
     return (pid_t)-1;
   snprintf(want, sizeof want, "socket:[%lu]", ino);
@@ -279,6 +289,8 @@ static void reap_orphan_hedgeytty_servers(void) {
   DIR *proc;
   struct dirent *pe;
 
+  if (!have_procfs())
+    return;
   proc = opendir("/proc");
   if (!proc)
     return;
@@ -304,6 +316,8 @@ static void reap_orphan_hedgeytty_servers(void) {
  *   0  — free (missing or stale; stale unlinked)
  *   1  — live server we must not displace (same console / unknown peer)
  *  -1  — live but reclaimed / other tty (caller may proceed)
+ *
+ * Without /proc (macOS): connectable socket → refuse; dead name → unlink.
  */
 static int probe_server_sock(const char *path) {
   struct stat st;
@@ -323,6 +337,27 @@ static int probe_server_sock(const char *path) {
     } else if (!S_ISSOCK(st.st_mode)) {
       return 0;
     }
+  }
+
+  if (!have_procfs()) {
+    /* Darwin: no listener PID — connect or clear stale path only. */
+    if (!have_node)
+      return 0;
+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0)
+      return 1;
+    memset(&addr, 0, sizeof addr);
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path, sizeof addr.sun_path - 1);
+    connected = connect(fd, (struct sockaddr *)&addr, sizeof addr) == 0;
+    close(fd);
+    if (connected) {
+      say("refusing to start — HedgeyTTY socket already in use.");
+      say("Quit that session first, or set HEDGEYTTY_ALLOW_NESTED=1.");
+      return 1;
+    }
+    unlink(path);
+    return 0;
   }
 
   peer = sock_listener_pid(path);
@@ -517,6 +552,42 @@ static void prepend_bindir_to_path(void) {
   setenv("PATH", neu, 1);
 }
 
+/*
+ * pty profile (Termux/macOS): ensure a usable TERM for xterm/termcap video.
+ * Never override TERM=linux on the console profile (breaks gpm/VT drivers).
+ */
+static void maybe_fix_pty_term(void) {
+  const char *home = getenv("HOME");
+  const char *term = getenv("TERM");
+  const char *envprof = getenv("HEDGEYTTY_PROFILE");
+  char path[512], buf[32];
+  int fd, n, is_pty = 0;
+
+  if (envprof && strcmp(envprof, "pty") == 0)
+    is_pty = 1;
+  else if (home && *home) {
+    snprintf(path, sizeof path, "%s/.config/hedgeytty/profile", home);
+    fd = open(path, O_RDONLY);
+    if (fd >= 0) {
+      n = (int)read(fd, buf, sizeof buf - 1);
+      close(fd);
+      if (n > 0) {
+        buf[n] = '\0';
+        if (buf[n - 1] == '\n')
+          buf[n - 1] = '\0';
+        if (strcmp(buf, "pty") == 0)
+          is_pty = 1;
+      }
+    }
+  }
+  if (!is_pty)
+    return;
+  if (term && term[0] && strcmp(term, "dumb") != 0 && strcmp(term, "unknown") != 0 &&
+      strcmp(term, "linux") != 0)
+    return;
+  setenv("TERM", "xterm-256color", 1);
+}
+
 int main(int argc, char *argv[]) {
   (void)argc;
 
@@ -524,6 +595,7 @@ int main(int argc, char *argv[]) {
     return 75;
 
   prepend_bindir_to_path();
+  maybe_fix_pty_term();
   redirect_stderr_to_log();
 
   argv[0] = bindir_hedgeytty_server;

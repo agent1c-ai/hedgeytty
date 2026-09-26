@@ -138,14 +138,29 @@ static void blend(byte *r, byte *g, byte *b, byte a, byte br, byte bg, byte bb) 
 }
 
 /* ImageMagick 7 = magick; Ubuntu packages ship IM6 as convert.
- * Twin Exec often has a PATH with only ~/.local/bin — prefer absolute paths. */
+ * Twin Exec often has a PATH with only ~/.local/bin — prefer absolute paths.
+ * Also probe Termux $PREFIX and Homebrew. */
 static const char *im_bin(void) {
   static const char *cached;
-  static const char *const abs[] = {"/usr/bin/magick", "/usr/local/bin/magick",
-                                    "/usr/bin/convert", "/usr/local/bin/convert", NULL};
+  static char from_prefix[512];
+  static const char *const abs[] = {
+      "/usr/bin/magick",           "/usr/local/bin/magick",
+      "/opt/homebrew/bin/magick",  "/usr/bin/convert",
+      "/usr/local/bin/convert",    "/opt/homebrew/bin/convert", NULL};
   const char *const *p;
+  const char *prefix;
+
   if (cached)
     return cached;
+  prefix = getenv("PREFIX"); /* Termux */
+  if (prefix && prefix[0]) {
+    snprintf(from_prefix, sizeof from_prefix, "%s/bin/magick", prefix);
+    if (access(from_prefix, X_OK) == 0)
+      return cached = from_prefix;
+    snprintf(from_prefix, sizeof from_prefix, "%s/bin/convert", prefix);
+    if (access(from_prefix, X_OK) == 0)
+      return cached = from_prefix;
+  }
   for (p = abs; *p; p++) {
     if (access(*p, X_OK) == 0)
       return cached = *p;
