@@ -111,11 +111,19 @@ static void blend(byte *r, byte *g, byte *b, byte a, byte br, byte bg, byte bb) 
   *b = (byte)((*b * a + bb * ia) / 255);
 }
 
-/* ImageMagick 7 = magick; Ubuntu packages ship IM6 as convert. */
+/* ImageMagick 7 = magick; Ubuntu packages ship IM6 as convert.
+ * Twin Exec often has a PATH with only ~/.local/bin — prefer absolute paths. */
 static const char *im_bin(void) {
   static const char *cached;
+  static const char *const abs[] = {"/usr/bin/magick", "/usr/local/bin/magick",
+                                    "/usr/bin/convert", "/usr/local/bin/convert", NULL};
+  const char *const *p;
   if (cached)
     return cached;
+  for (p = abs; *p; p++) {
+    if (access(*p, X_OK) == 0)
+      return cached = *p;
+  }
   if (system("command -v magick >/dev/null 2>&1") == 0)
     return cached = "magick";
   if (system("command -v convert >/dev/null 2>&1") == 0)
