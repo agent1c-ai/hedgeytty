@@ -94,19 +94,11 @@ static int live_server_sock(const char *path) {
  * the outer server still expects.
  */
 static int refuse_nested_console(void) {
-  const char *ttyn;
   int i;
   char path[64];
 
   if (env_truthy("HEDGEYTTY_ALLOW_NESTED"))
     return 0;
-
-  ttyn = ttyname(STDIN_FILENO);
-  if (ttyn && strncmp(ttyn, "/dev/pts/", 9) == 0) {
-    say("refusing to start from a pty (nested inside Twin/SSH).");
-    say("Quit Twin first, then run hedgeytty on the bare Linux console.");
-    return 1;
-  }
 
   for (i = 0; i < 8; i++) {
     snprintf(path, sizeof path, "/tmp/.Twin:%d", i);
