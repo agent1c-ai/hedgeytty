@@ -37,10 +37,22 @@ need_cmd() { command -v "$1" >/dev/null 2>&1 || die "missing required command: $
 sudo_cmd() {
   if [[ "$(id -u)" -eq 0 ]]; then
     "$@"
-  elif command -v sudo >/dev/null 2>&1; then
-    sudo "$@"
+    return
+  fi
+  command -v sudo >/dev/null 2>&1 || die "need root or sudo for: $*"
+  # Prefer Cursor/askpass when no tty (agents); otherwise normal sudo.
+  if [[ ! -t 0 ]] && [[ -z "${SUDO_ASKPASS:-}" ]]; then
+    local ap
+    ap=$(ls -d "${HOME}/.local/share/cursor-agent/versions/"*/cursor-askpass 2>/dev/null | sort -V | tail -1 || true)
+    if [[ -n "$ap" && -x "$ap" ]]; then
+      export SUDO_ASKPASS="$ap"
+      export SUDO_ASKPASS_REQUIRE=force
+    fi
+  fi
+  if [[ -n "${SUDO_ASKPASS:-}" ]]; then
+    sudo -A "$@" || die "sudo failed for: $*"
   else
-    die "need root or sudo for: $*"
+    sudo "$@" || die "sudo failed for: $*"
   fi
 }
 
@@ -53,11 +65,16 @@ install_build_deps() {
   command -v gpm >/dev/null || missing=1
   command -v magick >/dev/null || command -v convert >/dev/null || missing=1
   command -v curl >/dev/null || missing=1
-  [[ -f /usr/include/X11/Xlib.h ]] || missing=1
   [[ -f /usr/include/zlib.h ]] || missing=1
   # gpm daemon alone is not enough — without headers/lib, mouse compiles out
   [[ -f /usr/include/gpm.h ]] || missing=1
   [[ -e /usr/lib/x86_64-linux-gnu/libgpm.so || -e /usr/lib/libgpm.so ]] || missing=1
+  # X11/Xft are optional (console Twin needs only tty+gpm). Soft-check for nicer builds.
+  local want_x=0
+  if [[ "${HEDGEYTTY_WITH_X11:-0}" == 1 ]]; then
+    want_x=1
+    [[ -f /usr/include/X11/Xlib.h ]] || missing=1
+  fi
 
   if [[ "$missing" -eq 0 ]]; then
     log "build dependencies already present"
@@ -66,13 +83,18 @@ install_build_deps() {
   command -v apt-get >/dev/null || die "apt-get not found; install build deps manually"
   log "installing build dependencies (not the twin binary)"
   export DEBIAN_FRONTEND=noninteractive
-  sudo_cmd apt-get update -qq
-  sudo_cmd apt-get install -y \
-    build-essential autoconf automake libtool pkg-config \
-    gpm libgpm-dev \
-    imagemagick curl ca-certificates \
-    libx11-dev libxft-dev zlib1g-dev libncurses-dev \
+  local pkgs=(
+    build-essential autoconf automake libtool pkg-config
+    gpm libgpm-dev
+    imagemagick curl ca-certificates
+    zlib1g-dev libncurses-dev
     libltdl-dev
+  )
+  if [[ "$want_x" -eq 1 ]]; then
+    pkgs+=(libx11-dev libxft-dev)
+  fi
+  sudo_cmd apt-get update -qq
+  sudo_cmd apt-get install -y "${pkgs[@]}"
 }
 
 fetch_tree() {
@@ -110,7 +132,10 @@ build_and_install() {
   ./configure --prefix="$PREFIX" \
     --enable-socket \
     --enable-term \
-    --disable-ttlib
+    --enable-hw-tty \
+    --disable-ttlib \
+    --disable-hw-x11 \
+    --disable-hw-xft
   log "make -j$JOBS"
   if command -v lab-run >/dev/null 2>&1; then
     lab-run -- make -j"$JOBS"

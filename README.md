@@ -82,8 +82,9 @@ hedgeytty/
 - Linux virtual console (tested on Ubuntu)
 - Build packages (installer pulls on Debian/Ubuntu): `build-essential`,
   `autoconf`, `automake`, `libtool`, `pkg-config`, `gpm`, `libgpm-dev`,
-  `imagemagick`, `libx11-dev`, `libxft-dev`, `zlib1g-dev`, `libncurses-dev`,
-  `libltdl-dev` — **not** the `twin` WM binary
+  `imagemagick`, `zlib1g-dev`, `libncurses-dev`, `libltdl-dev` — **not** the
+  `twin` WM binary. X11 (`libx11-dev` / `libxft-dev`) is optional
+  (`HEDGEYTTY_WITH_X11=1`).
 
 Build time is a few minutes on a CPU laptop; prefix defaults to `~/.local`.
 
