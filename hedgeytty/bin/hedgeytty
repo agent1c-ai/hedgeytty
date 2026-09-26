@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# HedgeyTTY launcher — Twin-based textmode desktop with HedgeyTTY defaults.
+set -euo pipefail
+
+export PATH="${HOME}/.local/bin:${PATH}"
+
+# Prefer user twinrc installed by HedgeyTTY (same path Twin already reads).
+mkdir -p "${HOME}/.config/twin"
+
+# Linux console mouse: Twin talks to gpm.
+if [[ -z "${DISPLAY:-}" ]] && [[ "${TERM:-}" == linux* || -c /dev/tty0 ]]; then
+  if command -v systemctl >/dev/null 2>&1; then
+    if systemctl is-active --quiet gpm 2>/dev/null; then
+      :
+    elif systemctl is-enabled --quiet gpm 2>/dev/null; then
+      echo "hedgeytty: gpm is enabled but not running; mouse may not work until gpm starts" >&2
+    else
+      echo "hedgeytty: tip: enable gpm for console mouse (see docs/mouse.md)" >&2
+    fi
+  fi
+fi
+
+# Prefer system twin; fall back to a locally-built twin from this fork.
+TWIN_BIN="${HEDGEYTTY_TWIN:-}"
+if [[ -z "$TWIN_BIN" ]]; then
+  if command -v twin >/dev/null 2>&1; then
+    TWIN_BIN=$(command -v twin)
+  elif [[ -x "${HOME}/.local/libexec/hedgeytty/twin" ]]; then
+    TWIN_BIN="${HOME}/.local/libexec/hedgeytty/twin"
+  else
+    echo "hedgeytty: twin not found. Re-run the installer." >&2
+    exit 1
+  fi
+fi
+
+exec "$TWIN_BIN" "$@"

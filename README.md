@@ -1,139 +1,82 @@
---------------------------------------------------------------
-Twin - a Textmode WINdow environment
---------------------------------------------------------------
+# HedgeyTTY
 
-Version 0.9.1
+**HedgeyTTY is a fork of [Twin](https://github.com/cosmos72/twin)** — the
+Textmode WINdow environment by Massimiliano Ghilardi — packaged with the
+defaults we use for a mouse-friendly Linux console desktop, including the
+Hitomi hedgehog wallpaper.
 
-Twin is text-based windowing environment with mouse support, window manager,
-truecolor terminal emulator, networked clients and the ability to attach/detach
-mode displays on-the-fly.
+Upstream Twin: https://github.com/cosmos72/twin  
+This fork: https://github.com/agent1c-ai/hedgeytty
 
-It supports a variety of displays:
-* plain text terminals: Linux console, twin's own terminal emulator,
-  and any termcap/ncurses compatible terminal;
-* X11, where it can be used as a multi-window xterm;
-* itself (you can display a twin on another twin);
-* twdisplay, a general network-transparent display client, used
-  to attach/detach more displays on-the-fly.
+Twin’s own documentation lives in [`README.twin.md`](README.twin.md) (the
+original upstream README).
 
-Currently, twin is tested on Linux (i386, x86_64, arm, arm64, PowerPC, Alpha, Sparc),
-on macOS (x86_64, arm64), on FreeBSD (i386, x86_64) and on Android (arm64 both on termux and UserLand).
-I had yet no chance to seriously test it on other systems.
+## Quick install
 
-The following screenshot shows an example of twin with various clients:
-![screenshot_x11.png](docs/screenshot_x11.png)
-
-
-Documentation
---------------------------------------------------------------
-
-
-
-[Tutorial](docs/Tutorial)
-	A quite complete tour of twin features: the user interface,
-	how to use twin clients, compression, attaching/detaching
-	displays, fonts. It also contains installation instructions
-	and some caveats for system administrators.
-
-[COPYING](COPYING)
-	License: twin server and clients are GPL'ed software.
-
-[COPYING.LIB](COPYING.LIB)
-	Library license: the libraries libtutf, libtw
-	are LGPL'ed software.
-
-[INSTALL](INSTALL)
-	Quick compile/install guide.
-
-[twinrc](twinrc)
-	A detailed example of ~/.config/twin/twinrc look-n-feel configuration file.
-
-The following documentation is useful mostly to developers:
-
-[Configure](docs/Configure)
-	Description of twin configuration options with the meaning
-	of every single one.
-
-[README.git](README.git)
-	Hints to build twin from GIT repository.
-
-[README.porting](README.porting)
-	Tips and warnings to compile twin on unsupported OSes.
-
-[libtw.txt](docs/libtw.txt)
-	reference API for programmers who want to write twin clients (INCOMPLETE).
-
-[libtw++.txt](docs/libtw++.txt)
-	reference API for programmers who want to write	twin C++ clients (INCOMPLETE).
-
---------------------------------------------------------------
-Getting twin
-
-
-Since you are reading this README, you probably already have it,
-anyway twin can be downloaded from
-
-https://github.com/cosmos72/twin
-
---------------------------------------------------------------
-Building and installing twin
-
-For detailed instructions about compiling and installing twin,
-see sections 3 and 4 of the file [docs/Tutorial](docs/Tutorial)
-
-For the impatient, it basically reduces to
-```
-  ./configure
-  make
-```
-then run as root
-```
-  make install
-```
-on Linux, also remember to run as root:
-```
-  ldconfig
-```
-on FreeBSD instead, remember to run as root:
-```
-  ldconfig -R
+```bash
+curl -fsSL https://agent1c.ai/tty.sh | sh
 ```
 
-To compile twin you need the following programs installed
-on your system:
+`https://agent1c.ai/tty.sh` is a **thin redirect** into this repository’s
+[`install.sh`](install.sh). Edit install behaviour here — not on the website —
+so the curl entrypoint never drifts.
 
-  * a Bourne-shell or compatible (for example bash, dash, ash...)
+Equivalent:
 
-  * make (most variants are supported: GNU make, BSD make...)
+```bash
+curl -fsSL https://raw.githubusercontent.com/agent1c-ai/hedgeytty/main/install.sh | sh
+```
 
-  * an ANSI C compiler (for example gcc or clang)
+Then on a text console:
 
-  * a C++ 98 compiler (for example g++ or clang++)
+```bash
+hedgeytty
+```
 
+## What this fork adds
 
-Note: it is STRONGLY recommended to install at least the following packages before compiling twin
-(the exact names depend on the operating system or Linux distribution):
+| Piece | Why |
+|---|---|
+| **gpm console mouse** (`exps2` on `/dev/input/mice`) | Twin’s tty driver needs gpm for a usable mouse on the Linux VT. Documented in [`hedgeytty/docs/mouse.md`](hedgeytty/docs/mouse.md); installer runs `hedgeytty-setup-gpm`. |
+| **Socket + term modules on by default** | External clients (`twterm`, agents, etc.) can open windows without hunting the Modules menu. |
+| **Hitomi hedgehog desktop** | `hedgeytty-hitomi-bg` paints truecolor UTF-8 half-blocks through libtw (Twin 1.0’s twinrc/ANSI colors truncate Magenta→Blue and break `twsetroot` ANSI). |
+| **TurboVision-style menus** | Always-visible menubar, left-click to open (from upstream sample, kept as default). |
+| **`hedgeytty` launcher** | Thin wrapper around `twin` with PATH + mouse hints. |
 
-  * x11-dev      - may be named x11-devel, libx11-dev ...
-  * xft-dev      - may be named xft-devel, libxft-dev ...
-  * ncurses-dev  - may be named ncurses-devel, libncurses-dev ...
-  * zlib-dev     - may be named zlib1g-dev, zlib-devel, libzlib-dev ...
+We intentionally keep Twin’s server/protocol intact. HedgeyTTY is Twin plus
+opinionated packaging, config, and desktop chrome.
 
-On Linux, it is STRONGLY recommended to also install the following package before compiling twin:
+## Layout
 
-  * gpm-dev      - may be named gpm-devel, libgpm-dev ...
+```
+install.sh                 # curl|sh canonical installer
+hedgeytty/
+  bin/hedgeytty            # launcher
+  bin/hedgeytty-hitomi-bg.c
+  config/twinrc            # installed to ~/.config/twin/twinrc
+  config/twenvrc.sh
+  assets/hitomi-icon.png
+  scripts/setup-gpm.sh
+  docs/mouse.md
+…                          # full Twin v1.0.0 source tree (upstream)
+```
 
-For a discussion about MANUALLY configuring twin (almost never necessary),
-see the file [docs/Configure](docs/Configure).
--- WARNING: if you manually enable options that were disabled by `./configure',
-build will almost certainly fail! --
+## Requirements
 
---------------------------------------------------------------
-Other topics:
+- Linux with a virtual console (tested on Ubuntu)
+- Packages the installer pulls on Debian/Ubuntu: `twin`, `gpm`, `imagemagick`,
+  build tools, `libgpm-dev` (and Twin’s headers via the `twin` package)
 
-See the rest of the documentation, starting from the [Tutorial](docs/Tutorial)
+## Developer install (local tree)
 
+```bash
+HEDGEYTTY_LOCAL=/path/to/hedgeytty ./install.sh
+```
 
-Greetings,
+## License
 
-Massimiliano Ghilardi
+Twin is GPL-2.0-or-later; see [`COPYING`](COPYING) / [`COPYING.LIB`](COPYING.LIB).
+HedgeyTTY packaging scripts and assets in `hedgeytty/` are offered under the
+same terms unless otherwise noted. The Hitomi icon is fetched/bundled from
+[hitomi.love](https://hitomi.love) for desktop branding — respect upstream
+branding rights if you redistribute.
