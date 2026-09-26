@@ -92,7 +92,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = twdisplay$(EXEEXT) twin$(EXEEXT) twin_server$(EXEEXT)
+bin_PROGRAMS = htdisplay$(EXEEXT) hedgeytty$(EXEEXT) \
+	hedgeytty_server$(EXEEXT)
 @LIBRCPARSE_la_TRUE@am__append_1 = librcparse.la
 @LIBSOCKET_la_TRUE@am__append_2 = libsocket.la
 subdir = server
@@ -166,20 +167,11 @@ libsocket_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libsocket_la_LDFLAGS) $(LDFLAGS) -o $@
 @LIBSOCKET_la_TRUE@am_libsocket_la_rpath = -rpath $(pkglibdir)
-am_twdisplay_OBJECTS = alloc.$(OBJEXT) display.$(OBJEXT) \
-	dl_helper.$(OBJEXT) hw.$(OBJEXT) log.$(OBJEXT) \
-	missing.$(OBJEXT) palette.$(OBJEXT)
-twdisplay_OBJECTS = $(am_twdisplay_OBJECTS)
-twdisplay_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-twdisplay_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(twdisplay_LDFLAGS) $(LDFLAGS) -o $@
-am_twin_OBJECTS = twin-wrapper.$(OBJEXT)
-twin_OBJECTS = $(am_twin_OBJECTS)
-twin_LDADD = $(LDADD)
+am_hedgeytty_OBJECTS = hedgeytty-wrapper.$(OBJEXT)
+hedgeytty_OBJECTS = $(am_hedgeytty_OBJECTS)
+hedgeytty_LDADD = $(LDADD)
 am__dirstamp = $(am__leading_dot)dirstamp
-am_twin_server_OBJECTS = alloc.$(OBJEXT) builtin.$(OBJEXT) \
+am_hedgeytty_server_OBJECTS = alloc.$(OBJEXT) builtin.$(OBJEXT) \
 	data.$(OBJEXT) dl.$(OBJEXT) dl_helper.$(OBJEXT) draw.$(OBJEXT) \
 	extreg.$(OBJEXT) hw.$(OBJEXT) hw_multi.$(OBJEXT) log.$(OBJEXT) \
 	main.$(OBJEXT) methods.$(OBJEXT) missing.$(OBJEXT) \
@@ -193,12 +185,22 @@ am_twin_server_OBJECTS = alloc.$(OBJEXT) builtin.$(OBJEXT) \
 	rcrun.$(OBJEXT) remote.$(OBJEXT) resize.$(OBJEXT) \
 	shm.$(OBJEXT) scroller.$(OBJEXT) tterm.$(OBJEXT) tty.$(OBJEXT) \
 	util.$(OBJEXT) wm.$(OBJEXT)
-twin_server_OBJECTS = $(am_twin_server_OBJECTS)
-twin_server_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
-twin_server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
+hedgeytty_server_OBJECTS = $(am_hedgeytty_server_OBJECTS)
+hedgeytty_server_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+hedgeytty_server_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(AM_CXXFLAGS) $(CXXFLAGS) $(hedgeytty_server_LDFLAGS) \
+	$(LDFLAGS) -o $@
+am_htdisplay_OBJECTS = alloc.$(OBJEXT) display.$(OBJEXT) \
+	dl_helper.$(OBJEXT) hw.$(OBJEXT) log.$(OBJEXT) \
+	missing.$(OBJEXT) palette.$(OBJEXT)
+htdisplay_OBJECTS = $(am_htdisplay_OBJECTS)
+htdisplay_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+htdisplay_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(twin_server_LDFLAGS) $(LDFLAGS) -o $@
+	$(CXXFLAGS) $(htdisplay_LDFLAGS) $(LDFLAGS) -o $@
 SCRIPTS = $(bin_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -218,9 +220,9 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/builtin.Po \
 	./$(DEPDIR)/data.Po ./$(DEPDIR)/display.Po ./$(DEPDIR)/dl.Po \
 	./$(DEPDIR)/dl_helper.Po ./$(DEPDIR)/draw.Po \
-	./$(DEPDIR)/extreg.Po ./$(DEPDIR)/hw.Po \
-	./$(DEPDIR)/hw_multi.Po ./$(DEPDIR)/log.Po ./$(DEPDIR)/main.Po \
-	./$(DEPDIR)/md5.Plo ./$(DEPDIR)/methods.Po \
+	./$(DEPDIR)/extreg.Po ./$(DEPDIR)/hedgeytty-wrapper.Po \
+	./$(DEPDIR)/hw.Po ./$(DEPDIR)/hw_multi.Po ./$(DEPDIR)/log.Po \
+	./$(DEPDIR)/main.Po ./$(DEPDIR)/md5.Plo ./$(DEPDIR)/methods.Po \
 	./$(DEPDIR)/missing.Po ./$(DEPDIR)/palette.Po \
 	./$(DEPDIR)/printk.Po ./$(DEPDIR)/privilege.Po \
 	./$(DEPDIR)/pty.Po ./$(DEPDIR)/rcopt.Po \
@@ -228,16 +230,15 @@ am__depfiles_remade = ./$(DEPDIR)/alloc.Po ./$(DEPDIR)/builtin.Po \
 	./$(DEPDIR)/rcrun.Po ./$(DEPDIR)/remote.Po \
 	./$(DEPDIR)/resize.Po ./$(DEPDIR)/scroller.Po \
 	./$(DEPDIR)/shm.Po ./$(DEPDIR)/socket.Plo ./$(DEPDIR)/tterm.Po \
-	./$(DEPDIR)/tty.Po ./$(DEPDIR)/twin-wrapper.Po \
-	./$(DEPDIR)/util.Po ./$(DEPDIR)/wm.Po obj/$(DEPDIR)/all.Po \
-	obj/$(DEPDIR)/display.Po obj/$(DEPDIR)/gadget.Po \
-	obj/$(DEPDIR)/group.Po obj/$(DEPDIR)/id.Po \
-	obj/$(DEPDIR)/menu.Po obj/$(DEPDIR)/menuitem.Po \
-	obj/$(DEPDIR)/module.Po obj/$(DEPDIR)/msg.Po \
-	obj/$(DEPDIR)/msgport.Po obj/$(DEPDIR)/mutex.Po \
-	obj/$(DEPDIR)/obj.Po obj/$(DEPDIR)/row.Po \
-	obj/$(DEPDIR)/screen.Po obj/$(DEPDIR)/widget.Po \
-	obj/$(DEPDIR)/window.Po
+	./$(DEPDIR)/tty.Po ./$(DEPDIR)/util.Po ./$(DEPDIR)/wm.Po \
+	obj/$(DEPDIR)/all.Po obj/$(DEPDIR)/display.Po \
+	obj/$(DEPDIR)/gadget.Po obj/$(DEPDIR)/group.Po \
+	obj/$(DEPDIR)/id.Po obj/$(DEPDIR)/menu.Po \
+	obj/$(DEPDIR)/menuitem.Po obj/$(DEPDIR)/module.Po \
+	obj/$(DEPDIR)/msg.Po obj/$(DEPDIR)/msgport.Po \
+	obj/$(DEPDIR)/mutex.Po obj/$(DEPDIR)/obj.Po \
+	obj/$(DEPDIR)/row.Po obj/$(DEPDIR)/screen.Po \
+	obj/$(DEPDIR)/widget.Po obj/$(DEPDIR)/window.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -276,9 +277,11 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(librcparse_la_SOURCES) $(libsocket_la_SOURCES) \
-	$(twdisplay_SOURCES) $(twin_SOURCES) $(twin_server_SOURCES)
+	$(hedgeytty_SOURCES) $(hedgeytty_server_SOURCES) \
+	$(htdisplay_SOURCES)
 DIST_SOURCES = $(librcparse_la_SOURCES) $(libsocket_la_SOURCES) \
-	$(twdisplay_SOURCES) $(twin_SOURCES) $(twin_server_SOURCES)
+	$(hedgeytty_SOURCES) $(hedgeytty_server_SOURCES) \
+	$(htdisplay_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -381,6 +384,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -398,6 +402,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -519,13 +524,13 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = hw
-bin_SCRIPTS = twstart
+bin_SCRIPTS = htstart
 pkglib_LTLIBRARIES = $(am__append_1) $(am__append_2)
-AM_CPPFLAGS = -I$(top_srcdir)/include $(LTDLINCL) -DPLUGINDIR="\"$(pkglibdir)\"" -DCONFDIR="\"$(sysconfdir)/twin\""
-twin_CPPFLAGS = -I$(top_srcdir)/include $(LTDLINCL) -DBINDIR="\"$(bindir)\""
-twdisplay_SOURCES = alloc.cpp display.cpp dl_helper.cpp hw.cpp log.cpp missing.cpp palette.cpp
-twin_SOURCES = wrapper.c
-twin_server_SOURCES = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw.cpp extreg.cpp \
+AM_CPPFLAGS = -I$(top_srcdir)/include $(LTDLINCL) -DPLUGINDIR="\"$(pkglibdir)\"" -DCONFDIR="\"$(sysconfdir)/hedgeytty\""
+hedgeytty_CPPFLAGS = -I$(top_srcdir)/include $(LTDLINCL) -DBINDIR="\"$(bindir)\""
+htdisplay_SOURCES = alloc.cpp display.cpp dl_helper.cpp hw.cpp log.cpp missing.cpp palette.cpp
+hedgeytty_SOURCES = wrapper.c
+hedgeytty_server_SOURCES = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw.cpp extreg.cpp \
                         hw.cpp hw_multi.cpp log.cpp main.cpp methods.cpp missing.cpp palette.cpp \
                         obj/all.cpp obj/display.cpp obj/gadget.cpp obj/group.cpp \
                         obj/id.cpp obj/menu.cpp obj/menuitem.cpp obj/module.cpp obj/msg.cpp obj/msgport.cpp \
@@ -535,12 +540,12 @@ twin_server_SOURCES = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw.c
 
 librcparse_la_SOURCES = rcparse_tab.cpp rcparse_lex.cpp
 libsocket_la_SOURCES = md5.cpp socket.cpp
-twdisplay_LDFLAGS = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
-twin_server_LDFLAGS = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
-librcparse_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION)
-libsocket_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION)
-twdisplay_LDADD = $(LIBTW) $(LIBTUTF) $(LIBDL) $(LIBTSTL)
-twin_server_LDADD = $(LIBTUTF) $(LIBDL) $(LIBTSTL)
+htdisplay_LDFLAGS = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
+hedgeytty_server_LDFLAGS = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
+librcparse_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH)
+libsocket_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH)
+htdisplay_LDADD = $(LIBHT) $(LIBTUTF) $(LIBDL) $(LIBTSTL)
+hedgeytty_server_LDADD = $(LIBTUTF) $(LIBDL) $(LIBTSTL)
 librcparse_la_LIBADD = $(LIBTUTF) $(LIBTSTL)
 libsocket_la_LIBADD = $(LIBTUTF) $(LIBTSTL) $(LIBSOCK) $(LIBZ)
 all: all-recursive
@@ -660,13 +665,9 @@ librcparse.la: $(librcparse_la_OBJECTS) $(librcparse_la_DEPENDENCIES) $(EXTRA_li
 libsocket.la: $(libsocket_la_OBJECTS) $(libsocket_la_DEPENDENCIES) $(EXTRA_libsocket_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libsocket_la_LINK) $(am_libsocket_la_rpath) $(libsocket_la_OBJECTS) $(libsocket_la_LIBADD) $(LIBS)
 
-twdisplay$(EXEEXT): $(twdisplay_OBJECTS) $(twdisplay_DEPENDENCIES) $(EXTRA_twdisplay_DEPENDENCIES) 
-	@rm -f twdisplay$(EXEEXT)
-	$(AM_V_CXXLD)$(twdisplay_LINK) $(twdisplay_OBJECTS) $(twdisplay_LDADD) $(LIBS)
-
-twin$(EXEEXT): $(twin_OBJECTS) $(twin_DEPENDENCIES) $(EXTRA_twin_DEPENDENCIES) 
-	@rm -f twin$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twin_OBJECTS) $(twin_LDADD) $(LIBS)
+hedgeytty$(EXEEXT): $(hedgeytty_OBJECTS) $(hedgeytty_DEPENDENCIES) $(EXTRA_hedgeytty_DEPENDENCIES) 
+	@rm -f hedgeytty$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(hedgeytty_OBJECTS) $(hedgeytty_LDADD) $(LIBS)
 obj/$(am__dirstamp):
 	@$(MKDIR_P) obj
 	@: >>obj/$(am__dirstamp)
@@ -698,9 +699,13 @@ obj/widget.$(OBJEXT): obj/$(am__dirstamp) \
 obj/window.$(OBJEXT): obj/$(am__dirstamp) \
 	obj/$(DEPDIR)/$(am__dirstamp)
 
-twin_server$(EXEEXT): $(twin_server_OBJECTS) $(twin_server_DEPENDENCIES) $(EXTRA_twin_server_DEPENDENCIES) 
-	@rm -f twin_server$(EXEEXT)
-	$(AM_V_CXXLD)$(twin_server_LINK) $(twin_server_OBJECTS) $(twin_server_LDADD) $(LIBS)
+hedgeytty_server$(EXEEXT): $(hedgeytty_server_OBJECTS) $(hedgeytty_server_DEPENDENCIES) $(EXTRA_hedgeytty_server_DEPENDENCIES) 
+	@rm -f hedgeytty_server$(EXEEXT)
+	$(AM_V_CXXLD)$(hedgeytty_server_LINK) $(hedgeytty_server_OBJECTS) $(hedgeytty_server_LDADD) $(LIBS)
+
+htdisplay$(EXEEXT): $(htdisplay_OBJECTS) $(htdisplay_DEPENDENCIES) $(EXTRA_htdisplay_DEPENDENCIES) 
+	@rm -f htdisplay$(EXEEXT)
+	$(AM_V_CXXLD)$(htdisplay_LINK) $(htdisplay_OBJECTS) $(htdisplay_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_SCRIPTS)'; test -n "$(bindir)" || list=; \
@@ -752,6 +757,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dl_helper.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/draw.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/extreg.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hedgeytty-wrapper.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hw.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hw_multi.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/log.Po@am__quote@ # am--include-marker
@@ -774,7 +780,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/socket.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tterm.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/tty.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/twin-wrapper.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wm.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@obj/$(DEPDIR)/all.Po@am__quote@ # am--include-marker
@@ -824,19 +829,19 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-twin-wrapper.o: wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(twin_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT twin-wrapper.o -MD -MP -MF $(DEPDIR)/twin-wrapper.Tpo -c -o twin-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/twin-wrapper.Tpo $(DEPDIR)/twin-wrapper.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='twin-wrapper.o' libtool=no @AMDEPBACKSLASH@
+hedgeytty-wrapper.o: wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hedgeytty_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hedgeytty-wrapper.o -MD -MP -MF $(DEPDIR)/hedgeytty-wrapper.Tpo -c -o hedgeytty-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hedgeytty-wrapper.Tpo $(DEPDIR)/hedgeytty-wrapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='hedgeytty-wrapper.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(twin_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o twin-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hedgeytty_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hedgeytty-wrapper.o `test -f 'wrapper.c' || echo '$(srcdir)/'`wrapper.c
 
-twin-wrapper.obj: wrapper.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(twin_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT twin-wrapper.obj -MD -MP -MF $(DEPDIR)/twin-wrapper.Tpo -c -o twin-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/twin-wrapper.Tpo $(DEPDIR)/twin-wrapper.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='twin-wrapper.obj' libtool=no @AMDEPBACKSLASH@
+hedgeytty-wrapper.obj: wrapper.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hedgeytty_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT hedgeytty-wrapper.obj -MD -MP -MF $(DEPDIR)/hedgeytty-wrapper.Tpo -c -o hedgeytty-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/hedgeytty-wrapper.Tpo $(DEPDIR)/hedgeytty-wrapper.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='wrapper.c' object='hedgeytty-wrapper.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(twin_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o twin-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(hedgeytty_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o hedgeytty-wrapper.obj `if test -f 'wrapper.c'; then $(CYGPATH_W) 'wrapper.c'; else $(CYGPATH_W) '$(srcdir)/wrapper.c'; fi`
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -1079,6 +1084,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/dl_helper.Po
 	-rm -f ./$(DEPDIR)/draw.Po
 	-rm -f ./$(DEPDIR)/extreg.Po
+	-rm -f ./$(DEPDIR)/hedgeytty-wrapper.Po
 	-rm -f ./$(DEPDIR)/hw.Po
 	-rm -f ./$(DEPDIR)/hw_multi.Po
 	-rm -f ./$(DEPDIR)/log.Po
@@ -1101,7 +1107,6 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/socket.Plo
 	-rm -f ./$(DEPDIR)/tterm.Po
 	-rm -f ./$(DEPDIR)/tty.Po
-	-rm -f ./$(DEPDIR)/twin-wrapper.Po
 	-rm -f ./$(DEPDIR)/util.Po
 	-rm -f ./$(DEPDIR)/wm.Po
 	-rm -f obj/$(DEPDIR)/all.Po
@@ -1174,6 +1179,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/dl_helper.Po
 	-rm -f ./$(DEPDIR)/draw.Po
 	-rm -f ./$(DEPDIR)/extreg.Po
+	-rm -f ./$(DEPDIR)/hedgeytty-wrapper.Po
 	-rm -f ./$(DEPDIR)/hw.Po
 	-rm -f ./$(DEPDIR)/hw_multi.Po
 	-rm -f ./$(DEPDIR)/log.Po
@@ -1196,7 +1202,6 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/socket.Plo
 	-rm -f ./$(DEPDIR)/tterm.Po
 	-rm -f ./$(DEPDIR)/tty.Po
-	-rm -f ./$(DEPDIR)/twin-wrapper.Po
 	-rm -f ./$(DEPDIR)/util.Po
 	-rm -f ./$(DEPDIR)/wm.Po
 	-rm -f obj/$(DEPDIR)/all.Po

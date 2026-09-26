@@ -22,7 +22,7 @@
 #include "twin.h"    // IS_ALL(), IS_SCREEN()
 
 #include <new>
-#include <Tw/datasizes.h> // TW_MAXDAT
+#include <Ht/datasizes.h> // TW_MAXDAT
 
 Tscreen Sscreen::Create(dat namelen, const char *name, dat bgwidth, dat bgheight, const tcell *bg) {
   Tscreen screen = NULL;

@@ -39,7 +39,7 @@
 #include "hw_tty_common/decls.h"
 #include "palette.h"
 
-#include <Tw/Twkeys.h>
+#include <Ht/Twkeys.h>
 #include <Tutf/Tutf.h>
 
 #include <new> // placement new

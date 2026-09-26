@@ -9,10 +9,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 
 #include "version.h"
 

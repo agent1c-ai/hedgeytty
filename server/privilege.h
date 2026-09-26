@@ -9,7 +9,7 @@
 #ifndef TWIN_PRIVILEGE_H
 #define TWIN_PRIVILEGE_H
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #include "compiler.h"
 
 #ifdef TW_HAVE_UNISTD_H

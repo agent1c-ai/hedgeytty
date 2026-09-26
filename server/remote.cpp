@@ -342,7 +342,7 @@ void RemoteParanoia(void) {
   int safe, unsafe, test, last_errno;
   uldat Slot;
 
-  log(ERROR) << "twin: RemoteParanoia() called! Trying to recover from unexpected I/O error...\n";
+  log(ERROR) << "hedgeytty: RemoteParanoia() called! Trying to recover from unexpected I/O error...\n";
 
   /* rebuild max_fds, save_rfds, FdWQueued, save_wfds */
   FdWQueued = max_fds = 0;

@@ -29,7 +29,7 @@
 #define _XOPEN_SOURCE
 #endif
 
-#include <Tw/autoconf.h> /* for TW_HAVE* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE* macros */
 #include "twconfig.h"    /* for CONF_* macros */
 
 #ifdef TW_HAVE_STDLIB_H
@@ -78,7 +78,7 @@ static void ptyError(const char *d, const char *f, const char *arg) {
   const Chars cf = f ? Chars::from_c(f) : Chars("<NULL>");
   const Chars carg = arg ? Chars::from_c(arg) : Chars("<NULL>");
 
-  log(ERROR) << "twin: " << cd << ": " << cf << "(\"" << carg
+  log(ERROR) << "hedgeytty: " << cd << ": " << cf << "(\"" << carg
              << "\") failed: " << Chars::from_c(strerror(errno)) << "\n";
 }
 
@@ -153,7 +153,7 @@ static byte getPty(void) {
       }
     }
   }
-  log(ERROR) << "twin: failed to get a pty/tty pseudo-tty pair\n";
+  log(ERROR) << "hedgeytty: failed to get a pty/tty pseudo-tty pair\n";
 
 #endif
   return tfalse;

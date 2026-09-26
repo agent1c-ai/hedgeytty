@@ -10,7 +10,7 @@
  *
  */
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 
 #include "privilege.h"
 

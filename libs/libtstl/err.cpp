@@ -14,7 +14,7 @@
 #include "stl/chars.h"
 #include "twconfig.h" /* for CONF_* macros */
 
-#include <Tw/autoconf.h> /* for TW_HAVE_* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE_* macros */
 
 #include <cerrno> // errno
 

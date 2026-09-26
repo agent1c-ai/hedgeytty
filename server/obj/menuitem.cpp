@@ -18,7 +18,7 @@
 #include "twin.h"    // IS_WINDOW()
 
 #include <new>
-#include <Tw/datasizes.h> // TW_MAXLDAT
+#include <Ht/datasizes.h> // TW_MAXLDAT
 
 Tmenuitem Smenuitem::Create(Tobj parent, Twindow w, udat code, byte flags, dat left, ldat len,
                             dat shortcut, const char *name) {

@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <errno.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 #ifdef TW_HAVE_STRING_H
 #include <string.h>

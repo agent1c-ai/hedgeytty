@@ -50,7 +50,7 @@
 #include "stl/vector.h"
 #include "util.h"
 
-#include <Tw/Twkeys.h>
+#include <Ht/Twkeys.h>
 #include <Tutf/Tutf.h>
 
 String TmpDir;
@@ -1059,18 +1059,18 @@ static void TWDisplayIO(int fd, uldat slot) {
   }
 }
 
-static char envTWD[] = "TWDISPLAY=\0\0\0\0\0";
+static char envTWD[] = "HTDISPLAY=\0\0\0\0\0";
 
 static bool moveOldTwinrcFile(void);
 
 static bool initHOME(void) {
   const char *home = getenv("HOME");
   if (!home) {
-    log(ERROR) << "twin: required environment variable $HOME is not set. Aborting.\n";
+    log(ERROR) << "hedgeytty: required environment variable $HOME is not set. Aborting.\n";
     return false;
   }
   if (!HOME.format(Chars::from_c(home))) { // also append final '\0' but do not count it
-    log(ERROR) << "twin: out of memory! Aborting.\n";
+    log(ERROR) << "hedgeytty: out of memory! Aborting.\n";
     return false;
   }
   if (!moveOldTwinrcFile()) {
@@ -1097,8 +1097,8 @@ static void makeDirectories(char *path) {
 
 bool moveOldTwinrcFile(void) {
   String oldPath;
-  if (!oldPath.format(HOME, "/.twinrc")) {
-    log(ERROR) << "twin: out of memory! Aborting.\n";
+  if (!oldPath.format(HOME, "/.hedgeyttyrc")) {
+    log(ERROR) << "hedgeytty: out of memory! Aborting.\n";
     return false;
   }
   struct stat buf;
@@ -1106,21 +1106,21 @@ bool moveOldTwinrcFile(void) {
     return true;
   }
   String newPath;
-  if (!newPath.format(HOME, "/.config/twin/twinrc")) {
-    log(ERROR) << "twin: out of memory! Aborting.\n";
+  if (!newPath.format(HOME, "/.config/hedgeytty/hedgeyttyrc")) {
+    log(ERROR) << "hedgeytty: out of memory! Aborting.\n";
     return false;
   }
-  newPath[newPath.size() - 7] = '\0';
+  newPath[newPath.size() - 12] = '\0';
   makeDirectories(newPath.data());
-  newPath[newPath.size() - 7] = '/';
+  newPath[newPath.size() - 12] = '/';
   if (rename(oldPath.data(), newPath.data()) != 0) {
     log(ERROR)
-        << "twin: failed to move configuration file from old (and no longer supported) location "
+        << "hedgeytty: failed to move configuration file from old (and no longer supported) location "
         << oldPath << "\n      to the new location " << newPath << ": "
         << Chars::from_c(strerror(errno));
     return false;
   }
-  log(WARNING) << "twin: moved configuration file from old (and no longer supported) location "
+  log(WARNING) << "hedgeytty: moved configuration file from old (and no longer supported) location "
                << oldPath << "\n      to the new location " << newPath;
   return true;
 }
@@ -1140,26 +1140,26 @@ static bool initTmpDir(void) {
     TmpDir.pop_back();                       // but do not count it
     return true;
   }
-  log(ERROR) << "twin: out of memory! Aborting.\n";
+  log(ERROR) << "hedgeytty: out of memory! Aborting.\n";
   return false;
 }
 
 /**
  * initialize SOCKET_DIR to the directory where to create unix domain socket to listen on:
  * if getenv("XDG_STATE_HOME") is not null, use it + "/twin"
- * otherwise use HOME + "/.local/state/twin"
+ * otherwise use HOME + "/.local/state/hedgeytty"
  * on out-of-memory, return false
  */
-/** return getenv("XDG_STATE_HOME") + "/twin", getenv("HOME") + "/.local/state/twin"  */
+/** return getenv("XDG_STATE_HOME") + "/twin", getenv("HOME") + "/.local/state/hedgeytty"  */
 static bool initSocketDir(void) {
   const char *env = getenv("XDG_STATE_HOME");
-  if (env != NULL && SocketDir.format(Chars::from_c(env), Chars("/twin"))) {
+  if (env != NULL && SocketDir.format(Chars::from_c(env), Chars("/hedgeytty"))) {
     return true;
-  } else if (SocketDir.format(HOME, Chars("/.local/state/twin"))) {
+  } else if (SocketDir.format(HOME, Chars("/.local/state/hedgeytty"))) {
     return true;
   } else {
     SocketDir.clear();
-    log(ERROR) << "twin: out of memory! Aborting.\n";
+    log(ERROR) << "hedgeytty: out of memory! Aborting.\n";
     return false;
   }
 }
@@ -1184,9 +1184,9 @@ static const char *fullTWD = addr_unix.sun_path;
 static char twd[12];
 
 /*
- * create unix domain socket $HOME/.local/state/twin/socket:HHH
+ * create unix domain socket $HOME/.local/state/hedgeytty/socket:HHH
  * create symbolic link /tmp/.Twin:HHH pointing to the former
- * set TWDISPLAY to :HHH
+ * set HTDISPLAY to :HHH
  */
 bool InitTWDisplay(void) {
   char *arg0;
@@ -1205,7 +1205,7 @@ bool InitTWDisplay(void) {
       snprintf(twd, sizeof(twd), ":%hx", i);
 
       len = CopyToSockaddrUn(TmpDir.data(), &addr_unix, 0);
-      len = CopyToSockaddrUn("/.Twin", &addr_unix, len);
+      len = CopyToSockaddrUn("/.HedgeyTTY", &addr_unix, len);
       len = CopyToSockaddrUn(twd, &addr_unix, len);
 
       ok = bind(unixFd, (struct sockaddr *)&addr_unix, sizeof(addr_unix)) >= 0;
@@ -1215,7 +1215,7 @@ bool InitTWDisplay(void) {
         if (fd >= 0 || (fd = socket(AF_UNIX, SOCK_STREAM, 0)) >= 0) {
           if (connect(fd, (struct sockaddr *)&addr_unix, sizeof(addr_unix)) >= 0) {
             /*
-             * server is alive, try to grab another TWDISPLAY.
+             * server is alive, try to grab another HTDISPLAY.
              * also, we must close `fd' since SOCK_STREAM sockets
              * can connect() only once
              */
@@ -1257,13 +1257,13 @@ bool InitTWDisplay(void) {
              * solution: set it only in child processes, see spawnInWindow() in pty.cpp
              */
 #if defined(TW_HAVE_SETENV)
-            setenv("TWDISPLAY", TWDisplay, 1);
+            setenv("HTDISPLAY", TWDisplay, 1);
 #elif defined(TW_HAVE_PUTENV)
             putenv(envTWD);
 #endif
             size_t arg0_len = strlen(TWDisplay) + 6;
             if ((arg0 = (char *)AllocMem(arg0_len))) {
-              snprintf(arg0, arg0_len, "twin %s", TWDisplay);
+              snprintf(arg0, arg0_len, "hedgeytty %s", TWDisplay);
               SetArgv0(main_argv, main_argv_usable_len, arg0);
               FreeMem(arg0);
             }
@@ -1281,16 +1281,16 @@ bool InitTWDisplay(void) {
   CopyToSockaddrUn(TmpDir.data(), &addr_unix, 0);
   arg0 = addr_unix.sun_path;
 
-  log(ERROR) << "twin: failed to create any " << Chars::from_c(addr_unix.sun_path)
-             << "/.Twin* socket: " << Errstr << "\n      possible reasons: either "
+  log(ERROR) << "hedgeytty: failed to create any " << Chars::from_c(addr_unix.sun_path)
+             << "/.HedgeyTTY* socket: " << Errstr << "\n      possible reasons: either "
              << Chars::from_c(arg0)
-             << " is not writable, or all TWDISPLAY are already in use,\n"
+             << " is not writable, or all HTDISPLAY are already in use,\n"
                 "      or too many stale "
-             << Chars::from_c(arg0) << "/.Twin* sockets. Aborting.\n";
+             << Chars::from_c(arg0) << "/.HedgeyTTY* sockets. Aborting.\n";
   return false;
 }
 
-/* unlink /tmp/.Twin<TWDISPLAY> */
+/* unlink /tmp/.Twin<HTDISPLAY> */
 void QuitTWDisplay(void) {
   unlink(fullTWD);
 }
@@ -1400,18 +1400,18 @@ byte SetServerUid(uldat uid, byte privileges) {
           flag_secure = 1;
           if (setuid(0) < 0 || setgid(0) < 0 || chown(fullTWD, 0, 0) < 0 || !SetEnvs(getpwuid(0))) {
             /* tried to recover, but screwed up uids too badly. */
-            log(ERROR) << "twin: failed switching to uid " << uid << ": "
+            log(ERROR) << "hedgeytty: failed switching to uid " << uid << ": "
                        << Chars::from_c(strerror(errno))
                        << "\ntwin: also failed to recover. Quitting NOW!\n";
             Quit(0);
           }
         }
       }
-      log(ERROR) << "twin: failed switching to uid " << uid << ": "
+      log(ERROR) << "hedgeytty: failed switching to uid " << uid << ": "
                  << Chars::from_c(strerror(errno)) << "\n";
     }
   } else
-    log(ERROR) << "twin: SetServerUid() can be called only if started by root with \"-secure\".\n";
+    log(ERROR) << "hedgeytty: SetServerUid() can be called only if started by root with \"-secure\".\n";
   return tfalse;
 }
 
@@ -1423,8 +1423,8 @@ char *FindConfigFile(const char *name, uldat *file_size) {
       Chars("."),
   };
   const Chars infix[4] = {
-      Chars("/twin/"),
-      Chars("/.config/twin/"),
+      Chars("/hedgeytty/"),
+      Chars("/.config/hedgeytty/"),
       Chars("/"),
       Chars("/"),
   };
@@ -1504,13 +1504,13 @@ void RunTwEnvRC(void) {
   if (flag_secure == 0) {
     flag_envrc = 0;
 
-    if ((path = FindConfigFile("twenvrc.sh", NULL))) {
+    if ((path = FindConfigFile("htenvrc.sh", NULL))) {
       if ((pipe(fds) >= 0)) {
         switch (fork()) {
         case -1: /* error */
           close(fds[0]);
           close(fds[1]);
-          log(ERROR) << "twin: RunTwEnvRC(): fork() failed: " << Chars::from_c(strerror(errno))
+          log(ERROR) << "hedgeytty: RunTwEnvRC(): fork() failed: " << Chars::from_c(strerror(errno))
                      << "\n";
           break;
         case 0: /* child */
@@ -1534,12 +1534,12 @@ void RunTwEnvRC(void) {
           break;
         }
       } else
-        log(ERROR) << "twin: RunTwEnvRC(): pipe() failed: " << Chars::from_c(strerror(errno))
+        log(ERROR) << "hedgeytty: RunTwEnvRC(): pipe() failed: " << Chars::from_c(strerror(errno))
                    << "\n";
     } else
-      log(ERROR) << "twin: RunTwEnvRC(): twenvrc.sh: File not found\n";
+      log(ERROR) << "hedgeytty: RunTwEnvRC(): twenvrc.sh: File not found\n";
   } else
-    log(ERROR) << "twin: RunTwEnvRC(): delaying twenvrc.sh execution until secure mode ends.\n";
+    log(ERROR) << "hedgeytty: RunTwEnvRC(): delaying twenvrc.sh execution until secure mode ends.\n";
   FreeMem(path);
 }
 

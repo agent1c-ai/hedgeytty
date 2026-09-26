@@ -13,7 +13,7 @@
 #ifndef TWIN_H
 #define TWIN_H
 
-#include <Tw/autoconf.h> /* for TW_HAVE_* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE_* macros */
 #include "twconfig.h"    /* for CONF_* macros */
 
 #include "obj/fwd.h"
@@ -24,10 +24,10 @@
 #include "version.h"
 #include "osincludes.h"
 
-#include <Tw/Twtypes.h>
-#include <Tw/Tw_defs.h>
-#include <Tw/missing.h>
-#include <Tw/mouse.h>
+#include <Ht/Twtypes.h>
+#include <Ht/Tw_defs.h>
+#include <Ht/missing.h>
+#include <Ht/mouse.h>
 
 /***************/
 

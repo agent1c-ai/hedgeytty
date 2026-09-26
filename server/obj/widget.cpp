@@ -20,7 +20,7 @@
 #include "twin.h"    // IS_WIDGET()
 #include "draw.h"    // DrawAreaWidget()
 
-#include <Tw/Twstat_defs.h> // TWS_widget_*
+#include <Ht/Twstat_defs.h> // TWS_widget_*
 
 #include <new>
 #include <cstring> // memset()

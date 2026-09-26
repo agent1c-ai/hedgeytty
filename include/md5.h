@@ -18,8 +18,8 @@
 #ifndef MD5_H
 #define MD5_H
 
-#include <Tw/autoconf.h> /* TW_HAVE_*, uint32_t */
-#include <Tw/compiler.h> /* TW_INLINE, const */
+#include <Ht/autoconf.h> /* TW_HAVE_*, uint32_t */
+#include <Ht/compiler.h> /* TW_INLINE, const */
 
 #ifdef TW_HAVE_STDINT_H
 #include <stdint.h> /* uint32_t */

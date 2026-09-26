@@ -39,7 +39,7 @@
 #include "rcproto.h"
 #endif
 
-#include <Tw/Twkeys.h>
+#include <Ht/Twkeys.h>
 #include "hotkey.h"
 
 #include <Tutf/Tutf.h>
@@ -866,7 +866,7 @@ static void RCReload(void) {
   }
 #if 0
   else { /* this would garble -hw=tty display */
-    log(ERROR) << "twin: failed to load the RC parser:\n      " << Errstr << "\n";
+    log(ERROR) << "hedgeytty: failed to load the RC parser:\n      " << Errstr << "\n";
   }
 #endif
 

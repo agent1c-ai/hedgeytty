@@ -90,12 +90,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = twattach$(EXEEXT) twcat$(EXEEXT) twclip$(EXEEXT) \
-	twclutter$(EXEEXT) twcuckoo$(EXEEXT) twdialog$(EXEEXT) \
-	twevent$(EXEEXT) twfindtwin$(EXEEXT) twlsmsgport$(EXEEXT) \
-	twlsobj$(EXEEXT) twsendmsg$(EXEEXT) twsetroot$(EXEEXT) \
-	twsysmon$(EXEEXT) twterm$(EXEEXT) twthreadtest$(EXEEXT)
-sbin_PROGRAMS = twdm$(EXEEXT)
+bin_PROGRAMS = htattach$(EXEEXT) htcat$(EXEEXT) htclip$(EXEEXT) \
+	htclutter$(EXEEXT) htcuckoo$(EXEEXT) htdialog$(EXEEXT) \
+	htevent$(EXEEXT) htfindtwin$(EXEEXT) htlsmsgport$(EXEEXT) \
+	htlsobj$(EXEEXT) htsendmsg$(EXEEXT) htsetroot$(EXEEXT) \
+	htsysmon$(EXEEXT) htterm$(EXEEXT) htthreadtest$(EXEEXT) \
+	hedgeytty_hitomi_bg$(EXEEXT)
+sbin_PROGRAMS = htdm$(EXEEXT)
 subdir = clients
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -116,60 +117,63 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(sbindir)"
 PROGRAMS = $(bin_PROGRAMS) $(sbin_PROGRAMS)
-am_twattach_OBJECTS = attach.$(OBJEXT)
-twattach_OBJECTS = $(am_twattach_OBJECTS)
+am_hedgeytty_hitomi_bg_OBJECTS = hitomi-bg.$(OBJEXT)
+hedgeytty_hitomi_bg_OBJECTS = $(am_hedgeytty_hitomi_bg_OBJECTS)
 am__DEPENDENCIES_1 =
-twattach_DEPENDENCIES = $(am__DEPENDENCIES_1)
+hedgeytty_hitomi_bg_DEPENDENCIES = $(am__DEPENDENCIES_1)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_twcat_OBJECTS = cat.$(OBJEXT)
-twcat_OBJECTS = $(am_twcat_OBJECTS)
-twcat_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twclip_OBJECTS = clip.$(OBJEXT)
-twclip_OBJECTS = $(am_twclip_OBJECTS)
-twclip_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twclutter_OBJECTS = clutter.$(OBJEXT)
-twclutter_OBJECTS = $(am_twclutter_OBJECTS)
-twclutter_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twcuckoo_OBJECTS = cuckoo.$(OBJEXT)
-twcuckoo_OBJECTS = $(am_twcuckoo_OBJECTS)
-twcuckoo_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twdialog_OBJECTS = dialog.$(OBJEXT)
-twdialog_OBJECTS = $(am_twdialog_OBJECTS)
-twdialog_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twdm_OBJECTS = dm.$(OBJEXT)
-twdm_OBJECTS = $(am_twdm_OBJECTS)
-twdm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+am_htattach_OBJECTS = attach.$(OBJEXT)
+htattach_OBJECTS = $(am_htattach_OBJECTS)
+htattach_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htcat_OBJECTS = cat.$(OBJEXT)
+htcat_OBJECTS = $(am_htcat_OBJECTS)
+htcat_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htclip_OBJECTS = clip.$(OBJEXT)
+htclip_OBJECTS = $(am_htclip_OBJECTS)
+htclip_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htclutter_OBJECTS = clutter.$(OBJEXT)
+htclutter_OBJECTS = $(am_htclutter_OBJECTS)
+htclutter_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htcuckoo_OBJECTS = cuckoo.$(OBJEXT)
+htcuckoo_OBJECTS = $(am_htcuckoo_OBJECTS)
+htcuckoo_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htdialog_OBJECTS = dialog.$(OBJEXT)
+htdialog_OBJECTS = $(am_htdialog_OBJECTS)
+htdialog_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htdm_OBJECTS = dm.$(OBJEXT)
+htdm_OBJECTS = $(am_htdm_OBJECTS)
+htdm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
-am_twevent_OBJECTS = event.$(OBJEXT) util.$(OBJEXT)
-twevent_OBJECTS = $(am_twevent_OBJECTS)
-twevent_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twfindtwin_OBJECTS = findtwin.$(OBJEXT)
-twfindtwin_OBJECTS = $(am_twfindtwin_OBJECTS)
-twfindtwin_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twlsmsgport_OBJECTS = lsmsgport.$(OBJEXT)
-twlsmsgport_OBJECTS = $(am_twlsmsgport_OBJECTS)
-twlsmsgport_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twlsobj_OBJECTS = lsobj.$(OBJEXT)
-twlsobj_OBJECTS = $(am_twlsobj_OBJECTS)
-twlsobj_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twsendmsg_OBJECTS = sendmsg.$(OBJEXT)
-twsendmsg_OBJECTS = $(am_twsendmsg_OBJECTS)
-twsendmsg_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twsetroot_OBJECTS = setroot.$(OBJEXT)
-twsetroot_OBJECTS = $(am_twsetroot_OBJECTS)
-twsetroot_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twsysmon_OBJECTS = sysmon.$(OBJEXT) util.$(OBJEXT)
-twsysmon_OBJECTS = $(am_twsysmon_OBJECTS)
-twsysmon_DEPENDENCIES = $(am__DEPENDENCIES_1)
-am_twterm_OBJECTS = pty.$(OBJEXT) term.$(OBJEXT) util.$(OBJEXT)
-twterm_OBJECTS = $(am_twterm_OBJECTS)
-twterm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_twthreadtest_OBJECTS = threadtest.$(OBJEXT)
-twthreadtest_OBJECTS = $(am_twthreadtest_OBJECTS)
-twthreadtest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+am_htevent_OBJECTS = event.$(OBJEXT) util.$(OBJEXT)
+htevent_OBJECTS = $(am_htevent_OBJECTS)
+htevent_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htfindtwin_OBJECTS = findtwin.$(OBJEXT)
+htfindtwin_OBJECTS = $(am_htfindtwin_OBJECTS)
+htfindtwin_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htlsmsgport_OBJECTS = lsmsgport.$(OBJEXT)
+htlsmsgport_OBJECTS = $(am_htlsmsgport_OBJECTS)
+htlsmsgport_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htlsobj_OBJECTS = lsobj.$(OBJEXT)
+htlsobj_OBJECTS = $(am_htlsobj_OBJECTS)
+htlsobj_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htsendmsg_OBJECTS = sendmsg.$(OBJEXT)
+htsendmsg_OBJECTS = $(am_htsendmsg_OBJECTS)
+htsendmsg_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htsetroot_OBJECTS = setroot.$(OBJEXT)
+htsetroot_OBJECTS = $(am_htsetroot_OBJECTS)
+htsetroot_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htsysmon_OBJECTS = sysmon.$(OBJEXT) util.$(OBJEXT)
+htsysmon_OBJECTS = $(am_htsysmon_OBJECTS)
+htsysmon_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_htterm_OBJECTS = pty.$(OBJEXT) term.$(OBJEXT) util.$(OBJEXT)
+htterm_OBJECTS = $(am_htterm_OBJECTS)
+htterm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_htthreadtest_OBJECTS = threadtest.$(OBJEXT)
+htthreadtest_OBJECTS = $(am_htthreadtest_OBJECTS)
+htthreadtest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -190,8 +194,8 @@ am__depfiles_remade = ./$(DEPDIR)/attach.Po ./$(DEPDIR)/cat.Po \
 	./$(DEPDIR)/clip.Po ./$(DEPDIR)/clutter.Po \
 	./$(DEPDIR)/cuckoo.Po ./$(DEPDIR)/dialog.Po ./$(DEPDIR)/dm.Po \
 	./$(DEPDIR)/event.Po ./$(DEPDIR)/findtwin.Po \
-	./$(DEPDIR)/lsmsgport.Po ./$(DEPDIR)/lsobj.Po \
-	./$(DEPDIR)/pty.Po ./$(DEPDIR)/sendmsg.Po \
+	./$(DEPDIR)/hitomi-bg.Po ./$(DEPDIR)/lsmsgport.Po \
+	./$(DEPDIR)/lsobj.Po ./$(DEPDIR)/pty.Po ./$(DEPDIR)/sendmsg.Po \
 	./$(DEPDIR)/setroot.Po ./$(DEPDIR)/sysmon.Po \
 	./$(DEPDIR)/term.Po ./$(DEPDIR)/threadtest.Po \
 	./$(DEPDIR)/util.Po
@@ -214,18 +218,20 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(twattach_SOURCES) $(twcat_SOURCES) $(twclip_SOURCES) \
-	$(twclutter_SOURCES) $(twcuckoo_SOURCES) $(twdialog_SOURCES) \
-	$(twdm_SOURCES) $(twevent_SOURCES) $(twfindtwin_SOURCES) \
-	$(twlsmsgport_SOURCES) $(twlsobj_SOURCES) $(twsendmsg_SOURCES) \
-	$(twsetroot_SOURCES) $(twsysmon_SOURCES) $(twterm_SOURCES) \
-	$(twthreadtest_SOURCES)
-DIST_SOURCES = $(twattach_SOURCES) $(twcat_SOURCES) $(twclip_SOURCES) \
-	$(twclutter_SOURCES) $(twcuckoo_SOURCES) $(twdialog_SOURCES) \
-	$(twdm_SOURCES) $(twevent_SOURCES) $(twfindtwin_SOURCES) \
-	$(twlsmsgport_SOURCES) $(twlsobj_SOURCES) $(twsendmsg_SOURCES) \
-	$(twsetroot_SOURCES) $(twsysmon_SOURCES) $(twterm_SOURCES) \
-	$(twthreadtest_SOURCES)
+SOURCES = $(hedgeytty_hitomi_bg_SOURCES) $(htattach_SOURCES) \
+	$(htcat_SOURCES) $(htclip_SOURCES) $(htclutter_SOURCES) \
+	$(htcuckoo_SOURCES) $(htdialog_SOURCES) $(htdm_SOURCES) \
+	$(htevent_SOURCES) $(htfindtwin_SOURCES) \
+	$(htlsmsgport_SOURCES) $(htlsobj_SOURCES) $(htsendmsg_SOURCES) \
+	$(htsetroot_SOURCES) $(htsysmon_SOURCES) $(htterm_SOURCES) \
+	$(htthreadtest_SOURCES)
+DIST_SOURCES = $(hedgeytty_hitomi_bg_SOURCES) $(htattach_SOURCES) \
+	$(htcat_SOURCES) $(htclip_SOURCES) $(htclutter_SOURCES) \
+	$(htcuckoo_SOURCES) $(htdialog_SOURCES) $(htdm_SOURCES) \
+	$(htevent_SOURCES) $(htfindtwin_SOURCES) \
+	$(htlsmsgport_SOURCES) $(htlsobj_SOURCES) $(htsendmsg_SOURCES) \
+	$(htsetroot_SOURCES) $(htsysmon_SOURCES) $(htterm_SOURCES) \
+	$(htthreadtest_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -328,6 +334,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -345,6 +352,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -466,39 +474,41 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = mapscrn
-AM_CPPFLAGS = -I$(top_srcdir)/include
-twattach_SOURCES = attach.c
-twcat_SOURCES = cat.c
-twclip_SOURCES = clip.c
-twclutter_SOURCES = clutter.c
-twcuckoo_SOURCES = cuckoo.c
-twdialog_SOURCES = dialog.c
-twdm_SOURCES = dm.c
-twevent_SOURCES = event.c util.c
-twfindtwin_SOURCES = findtwin.c
-twlsmsgport_SOURCES = lsmsgport.c
-twlsobj_SOURCES = lsobj.c
-twsendmsg_SOURCES = sendmsg.c
-twsetroot_SOURCES = setroot.c
-twsysmon_SOURCES = sysmon.c util.c
-twterm_SOURCES = pty.c term.c util.c
-twthreadtest_SOURCES = threadtest.c
-twattach_LDADD = $(LIBTW)
-twcat_LDADD = $(LIBTW)
-twclip_LDADD = $(LIBTW)
-twclutter_LDADD = $(LIBTW)
-twcuckoo_LDADD = $(LIBTW)
-twdialog_LDADD = $(LIBTW)
-twdm_LDADD = $(LIBTW) $(LIBTUTF) $(LIBCRYPT)
-twevent_LDADD = $(LIBTW)
-twfindtwin_LDADD = $(LIBTW)
-twlsmsgport_LDADD = $(LIBTW)
-twlsobj_LDADD = $(LIBTW)
-twsendmsg_LDADD = $(LIBTW)
-twsetroot_LDADD = $(LIBTW)
-twsysmon_LDADD = $(LIBTW)
-twterm_LDADD = $(LIBTW) $(LIBTUTF)
-twthreadtest_LDADD = $(LIBTW) $(LIBPTHREAD)
+AM_CPPFLAGS = -I$(top_srcdir)/include -DDATADIR="\"$(datadir)/hedgeytty\""
+htattach_SOURCES = attach.c
+htcat_SOURCES = cat.c
+htclip_SOURCES = clip.c
+htclutter_SOURCES = clutter.c
+htcuckoo_SOURCES = cuckoo.c
+htdialog_SOURCES = dialog.c
+htdm_SOURCES = dm.c
+htevent_SOURCES = event.c util.c
+htfindtwin_SOURCES = findtwin.c
+htlsmsgport_SOURCES = lsmsgport.c
+htlsobj_SOURCES = lsobj.c
+htsendmsg_SOURCES = sendmsg.c
+htsetroot_SOURCES = setroot.c
+htsysmon_SOURCES = sysmon.c util.c
+htterm_SOURCES = pty.c term.c util.c
+htthreadtest_SOURCES = threadtest.c
+hedgeytty_hitomi_bg_SOURCES = hitomi-bg.c
+htattach_LDADD = $(LIBHT)
+htcat_LDADD = $(LIBHT)
+htclip_LDADD = $(LIBHT)
+htclutter_LDADD = $(LIBHT)
+htcuckoo_LDADD = $(LIBHT)
+htdialog_LDADD = $(LIBHT)
+htdm_LDADD = $(LIBHT) $(LIBTUTF) $(LIBCRYPT)
+htevent_LDADD = $(LIBHT)
+htfindtwin_LDADD = $(LIBHT)
+htlsmsgport_LDADD = $(LIBHT)
+htlsobj_LDADD = $(LIBHT)
+htsendmsg_LDADD = $(LIBHT)
+htsetroot_LDADD = $(LIBHT)
+htsysmon_LDADD = $(LIBHT)
+htterm_LDADD = $(LIBHT) $(LIBTUTF)
+htthreadtest_LDADD = $(LIBHT) $(LIBPTHREAD)
+hedgeytty_hitomi_bg_LDADD = $(LIBHT)
 all: all-recursive
 
 .SUFFIXES:
@@ -621,69 +631,73 @@ clean-sbinPROGRAMS:
 	$(am__rm_f) $(sbin_PROGRAMS)
 	test -z "$(EXEEXT)" || $(am__rm_f) $(sbin_PROGRAMS:$(EXEEXT)=)
 
-twattach$(EXEEXT): $(twattach_OBJECTS) $(twattach_DEPENDENCIES) $(EXTRA_twattach_DEPENDENCIES) 
-	@rm -f twattach$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twattach_OBJECTS) $(twattach_LDADD) $(LIBS)
+hedgeytty_hitomi_bg$(EXEEXT): $(hedgeytty_hitomi_bg_OBJECTS) $(hedgeytty_hitomi_bg_DEPENDENCIES) $(EXTRA_hedgeytty_hitomi_bg_DEPENDENCIES) 
+	@rm -f hedgeytty_hitomi_bg$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(hedgeytty_hitomi_bg_OBJECTS) $(hedgeytty_hitomi_bg_LDADD) $(LIBS)
 
-twcat$(EXEEXT): $(twcat_OBJECTS) $(twcat_DEPENDENCIES) $(EXTRA_twcat_DEPENDENCIES) 
-	@rm -f twcat$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twcat_OBJECTS) $(twcat_LDADD) $(LIBS)
+htattach$(EXEEXT): $(htattach_OBJECTS) $(htattach_DEPENDENCIES) $(EXTRA_htattach_DEPENDENCIES) 
+	@rm -f htattach$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htattach_OBJECTS) $(htattach_LDADD) $(LIBS)
 
-twclip$(EXEEXT): $(twclip_OBJECTS) $(twclip_DEPENDENCIES) $(EXTRA_twclip_DEPENDENCIES) 
-	@rm -f twclip$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twclip_OBJECTS) $(twclip_LDADD) $(LIBS)
+htcat$(EXEEXT): $(htcat_OBJECTS) $(htcat_DEPENDENCIES) $(EXTRA_htcat_DEPENDENCIES) 
+	@rm -f htcat$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htcat_OBJECTS) $(htcat_LDADD) $(LIBS)
 
-twclutter$(EXEEXT): $(twclutter_OBJECTS) $(twclutter_DEPENDENCIES) $(EXTRA_twclutter_DEPENDENCIES) 
-	@rm -f twclutter$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twclutter_OBJECTS) $(twclutter_LDADD) $(LIBS)
+htclip$(EXEEXT): $(htclip_OBJECTS) $(htclip_DEPENDENCIES) $(EXTRA_htclip_DEPENDENCIES) 
+	@rm -f htclip$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htclip_OBJECTS) $(htclip_LDADD) $(LIBS)
 
-twcuckoo$(EXEEXT): $(twcuckoo_OBJECTS) $(twcuckoo_DEPENDENCIES) $(EXTRA_twcuckoo_DEPENDENCIES) 
-	@rm -f twcuckoo$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twcuckoo_OBJECTS) $(twcuckoo_LDADD) $(LIBS)
+htclutter$(EXEEXT): $(htclutter_OBJECTS) $(htclutter_DEPENDENCIES) $(EXTRA_htclutter_DEPENDENCIES) 
+	@rm -f htclutter$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htclutter_OBJECTS) $(htclutter_LDADD) $(LIBS)
 
-twdialog$(EXEEXT): $(twdialog_OBJECTS) $(twdialog_DEPENDENCIES) $(EXTRA_twdialog_DEPENDENCIES) 
-	@rm -f twdialog$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twdialog_OBJECTS) $(twdialog_LDADD) $(LIBS)
+htcuckoo$(EXEEXT): $(htcuckoo_OBJECTS) $(htcuckoo_DEPENDENCIES) $(EXTRA_htcuckoo_DEPENDENCIES) 
+	@rm -f htcuckoo$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htcuckoo_OBJECTS) $(htcuckoo_LDADD) $(LIBS)
 
-twdm$(EXEEXT): $(twdm_OBJECTS) $(twdm_DEPENDENCIES) $(EXTRA_twdm_DEPENDENCIES) 
-	@rm -f twdm$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twdm_OBJECTS) $(twdm_LDADD) $(LIBS)
+htdialog$(EXEEXT): $(htdialog_OBJECTS) $(htdialog_DEPENDENCIES) $(EXTRA_htdialog_DEPENDENCIES) 
+	@rm -f htdialog$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htdialog_OBJECTS) $(htdialog_LDADD) $(LIBS)
 
-twevent$(EXEEXT): $(twevent_OBJECTS) $(twevent_DEPENDENCIES) $(EXTRA_twevent_DEPENDENCIES) 
-	@rm -f twevent$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twevent_OBJECTS) $(twevent_LDADD) $(LIBS)
+htdm$(EXEEXT): $(htdm_OBJECTS) $(htdm_DEPENDENCIES) $(EXTRA_htdm_DEPENDENCIES) 
+	@rm -f htdm$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htdm_OBJECTS) $(htdm_LDADD) $(LIBS)
 
-twfindtwin$(EXEEXT): $(twfindtwin_OBJECTS) $(twfindtwin_DEPENDENCIES) $(EXTRA_twfindtwin_DEPENDENCIES) 
-	@rm -f twfindtwin$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twfindtwin_OBJECTS) $(twfindtwin_LDADD) $(LIBS)
+htevent$(EXEEXT): $(htevent_OBJECTS) $(htevent_DEPENDENCIES) $(EXTRA_htevent_DEPENDENCIES) 
+	@rm -f htevent$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htevent_OBJECTS) $(htevent_LDADD) $(LIBS)
 
-twlsmsgport$(EXEEXT): $(twlsmsgport_OBJECTS) $(twlsmsgport_DEPENDENCIES) $(EXTRA_twlsmsgport_DEPENDENCIES) 
-	@rm -f twlsmsgport$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twlsmsgport_OBJECTS) $(twlsmsgport_LDADD) $(LIBS)
+htfindtwin$(EXEEXT): $(htfindtwin_OBJECTS) $(htfindtwin_DEPENDENCIES) $(EXTRA_htfindtwin_DEPENDENCIES) 
+	@rm -f htfindtwin$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htfindtwin_OBJECTS) $(htfindtwin_LDADD) $(LIBS)
 
-twlsobj$(EXEEXT): $(twlsobj_OBJECTS) $(twlsobj_DEPENDENCIES) $(EXTRA_twlsobj_DEPENDENCIES) 
-	@rm -f twlsobj$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twlsobj_OBJECTS) $(twlsobj_LDADD) $(LIBS)
+htlsmsgport$(EXEEXT): $(htlsmsgport_OBJECTS) $(htlsmsgport_DEPENDENCIES) $(EXTRA_htlsmsgport_DEPENDENCIES) 
+	@rm -f htlsmsgport$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htlsmsgport_OBJECTS) $(htlsmsgport_LDADD) $(LIBS)
 
-twsendmsg$(EXEEXT): $(twsendmsg_OBJECTS) $(twsendmsg_DEPENDENCIES) $(EXTRA_twsendmsg_DEPENDENCIES) 
-	@rm -f twsendmsg$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twsendmsg_OBJECTS) $(twsendmsg_LDADD) $(LIBS)
+htlsobj$(EXEEXT): $(htlsobj_OBJECTS) $(htlsobj_DEPENDENCIES) $(EXTRA_htlsobj_DEPENDENCIES) 
+	@rm -f htlsobj$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htlsobj_OBJECTS) $(htlsobj_LDADD) $(LIBS)
 
-twsetroot$(EXEEXT): $(twsetroot_OBJECTS) $(twsetroot_DEPENDENCIES) $(EXTRA_twsetroot_DEPENDENCIES) 
-	@rm -f twsetroot$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twsetroot_OBJECTS) $(twsetroot_LDADD) $(LIBS)
+htsendmsg$(EXEEXT): $(htsendmsg_OBJECTS) $(htsendmsg_DEPENDENCIES) $(EXTRA_htsendmsg_DEPENDENCIES) 
+	@rm -f htsendmsg$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htsendmsg_OBJECTS) $(htsendmsg_LDADD) $(LIBS)
 
-twsysmon$(EXEEXT): $(twsysmon_OBJECTS) $(twsysmon_DEPENDENCIES) $(EXTRA_twsysmon_DEPENDENCIES) 
-	@rm -f twsysmon$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twsysmon_OBJECTS) $(twsysmon_LDADD) $(LIBS)
+htsetroot$(EXEEXT): $(htsetroot_OBJECTS) $(htsetroot_DEPENDENCIES) $(EXTRA_htsetroot_DEPENDENCIES) 
+	@rm -f htsetroot$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htsetroot_OBJECTS) $(htsetroot_LDADD) $(LIBS)
 
-twterm$(EXEEXT): $(twterm_OBJECTS) $(twterm_DEPENDENCIES) $(EXTRA_twterm_DEPENDENCIES) 
-	@rm -f twterm$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twterm_OBJECTS) $(twterm_LDADD) $(LIBS)
+htsysmon$(EXEEXT): $(htsysmon_OBJECTS) $(htsysmon_DEPENDENCIES) $(EXTRA_htsysmon_DEPENDENCIES) 
+	@rm -f htsysmon$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htsysmon_OBJECTS) $(htsysmon_LDADD) $(LIBS)
 
-twthreadtest$(EXEEXT): $(twthreadtest_OBJECTS) $(twthreadtest_DEPENDENCIES) $(EXTRA_twthreadtest_DEPENDENCIES) 
-	@rm -f twthreadtest$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(twthreadtest_OBJECTS) $(twthreadtest_LDADD) $(LIBS)
+htterm$(EXEEXT): $(htterm_OBJECTS) $(htterm_DEPENDENCIES) $(EXTRA_htterm_DEPENDENCIES) 
+	@rm -f htterm$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htterm_OBJECTS) $(htterm_LDADD) $(LIBS)
+
+htthreadtest$(EXEEXT): $(htthreadtest_OBJECTS) $(htthreadtest_DEPENDENCIES) $(EXTRA_htthreadtest_DEPENDENCIES) 
+	@rm -f htthreadtest$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htthreadtest_OBJECTS) $(htthreadtest_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -700,6 +714,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dm.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/event.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findtwin.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hitomi-bg.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lsmsgport.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lsobj.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pty.Po@am__quote@ # am--include-marker
@@ -956,6 +971,7 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/dm.Po
 	-rm -f ./$(DEPDIR)/event.Po
 	-rm -f ./$(DEPDIR)/findtwin.Po
+	-rm -f ./$(DEPDIR)/hitomi-bg.Po
 	-rm -f ./$(DEPDIR)/lsmsgport.Po
 	-rm -f ./$(DEPDIR)/lsobj.Po
 	-rm -f ./$(DEPDIR)/pty.Po
@@ -1020,6 +1036,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/dm.Po
 	-rm -f ./$(DEPDIR)/event.Po
 	-rm -f ./$(DEPDIR)/findtwin.Po
+	-rm -f ./$(DEPDIR)/hitomi-bg.Po
 	-rm -f ./$(DEPDIR)/lsmsgport.Po
 	-rm -f ./$(DEPDIR)/lsobj.Po
 	-rm -f ./$(DEPDIR)/pty.Po
@@ -1071,8 +1088,10 @@ uninstall-am: uninstall-binPROGRAMS uninstall-sbinPROGRAMS
 
 
 install-exec-hook:
-	rm -f            $(DESTDIR)$(bindir)/twdetach
-	$(LN_S) twattach $(DESTDIR)$(bindir)/twdetach
+	rm -f            $(DESTDIR)$(bindir)/htdetach
+	$(LN_S) htattach $(DESTDIR)$(bindir)/htdetach
+	rm -f            $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg
+	$(LN_S) hedgeytty_hitomi_bg $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -9,7 +9,7 @@
  *
  */
 
-#include <Tw/Twtypes.h>
+#include <Ht/Twtypes.h>
 
 #ifndef TW_HAVE_GETENV
 char *Tw_missing_getenv(const char *name) {

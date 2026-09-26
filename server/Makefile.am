@@ -1,7 +1,7 @@
 SUBDIRS = hw
 
-bin_PROGRAMS       = twdisplay twin twin_server
-bin_SCRIPTS        = twstart
+bin_PROGRAMS       = htdisplay hedgeytty hedgeytty_server
+bin_SCRIPTS        = htstart
 pkglib_LTLIBRARIES =
 
 if LIBRCPARSE_la
@@ -11,12 +11,12 @@ if LIBSOCKET_la
   pkglib_LTLIBRARIES += libsocket.la
 endif
 
-AM_CPPFLAGS           = -I$(top_srcdir)/include $(LTDLINCL) -DPLUGINDIR="\"$(pkglibdir)\"" -DCONFDIR="\"$(sysconfdir)/twin\""
-twin_CPPFLAGS         = -I$(top_srcdir)/include $(LTDLINCL) -DBINDIR="\"$(bindir)\""
+AM_CPPFLAGS                = -I$(top_srcdir)/include $(LTDLINCL) -DPLUGINDIR="\"$(pkglibdir)\"" -DCONFDIR="\"$(sysconfdir)/hedgeytty\""
+hedgeytty_CPPFLAGS         = -I$(top_srcdir)/include $(LTDLINCL) -DBINDIR="\"$(bindir)\""
 
-twdisplay_SOURCES     = alloc.cpp display.cpp dl_helper.cpp hw.cpp log.cpp missing.cpp palette.cpp
-twin_SOURCES          = wrapper.c
-twin_server_SOURCES   = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw.cpp extreg.cpp \
+htdisplay_SOURCES          = alloc.cpp display.cpp dl_helper.cpp hw.cpp log.cpp missing.cpp palette.cpp
+hedgeytty_SOURCES          = wrapper.c
+hedgeytty_server_SOURCES   = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw.cpp extreg.cpp \
                         hw.cpp hw_multi.cpp log.cpp main.cpp methods.cpp missing.cpp palette.cpp \
                         obj/all.cpp obj/display.cpp obj/gadget.cpp obj/group.cpp \
                         obj/id.cpp obj/menu.cpp obj/menuitem.cpp obj/module.cpp obj/msg.cpp obj/msgport.cpp \
@@ -27,15 +27,14 @@ twin_server_SOURCES   = alloc.cpp builtin.cpp data.cpp dl.cpp dl_helper.cpp draw
 librcparse_la_SOURCES = rcparse_tab.cpp rcparse_lex.cpp
 libsocket_la_SOURCES  = md5.cpp socket.cpp
 
-twdisplay_LDFLAGS     = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
-twin_server_LDFLAGS   = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
+htdisplay_LDFLAGS     = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
+hedgeytty_server_LDFLAGS   = -export-dynamic $(LDFLAGS_BIN_EXPORT_DYNAMIC)
 
-librcparse_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION)
-libsocket_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION)
+librcparse_la_LDFLAGS = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH)
+libsocket_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH)
 
-twdisplay_LDADD       = $(LIBTW) $(LIBTUTF) $(LIBDL) $(LIBTSTL)
-twin_server_LDADD     =          $(LIBTUTF) $(LIBDL) $(LIBTSTL)
+htdisplay_LDADD       = $(LIBHT) $(LIBTUTF) $(LIBDL) $(LIBTSTL)
+hedgeytty_server_LDADD     =          $(LIBTUTF) $(LIBDL) $(LIBTSTL)
 
 librcparse_la_LIBADD  = $(LIBTUTF) $(LIBTSTL)
 libsocket_la_LIBADD   = $(LIBTUTF) $(LIBTSTL) $(LIBSOCK) $(LIBZ)
-

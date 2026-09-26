@@ -30,8 +30,8 @@
 #include "util.h"
 #include "version.h"
 
-#include <Tw/Twkeys.h>
-#include <Tw/autoconf.h>
+#include <Ht/Twkeys.h>
+#include <Ht/autoconf.h>
 
 #include <Tutf/Tutf.h>
 #include <Tutf/Tutf_defs.h>
@@ -790,7 +790,7 @@ static bool InitScreens(void) {
     return true;
   }
   Error(NOMEMORY);
-  log(ERROR) << "twin: InitScreens(): " << Errstr << "\n";
+  log(ERROR) << "hedgeytty: InitScreens(): " << Errstr << "\n";
   return false;
 }
 
@@ -997,6 +997,6 @@ bool InitBuiltin(void) {
     return ttrue;
   }
   Error(NOMEMORY);
-  log(ERROR) << "twin: InitBuiltin(): " << Errstr << "\n";
+  log(ERROR) << "hedgeytty: InitBuiltin(): " << Errstr << "\n";
   return tfalse;
 }

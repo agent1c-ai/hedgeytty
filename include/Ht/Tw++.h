@@ -33,10 +33,10 @@
 #include <string.h>
 
 #ifndef TW_H
-#include <Tw/Tw.h>
+#include <Ht/Tw.h>
 #endif
 #ifndef TW_ERRNO_H
-#include <Tw/Twerrno.h>
+#include <Ht/Twerrno.h>
 #endif
 
 class TEmpty;

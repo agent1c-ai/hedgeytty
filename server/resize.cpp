@@ -13,7 +13,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 
 #ifdef TW_HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
@@ -41,8 +41,8 @@
 #include "stl/utf8.h"
 #include "stl/vector.h"
 
-#include <Tw/Tw.h>
-#include <Tw/Twstat.h>
+#include <Ht/Tw.h>
+#include <Ht/Twstat.h>
 #include <Tutf/Tutf.h>
 
 /***************/
@@ -1673,7 +1673,7 @@ static void TraverseMenu(Tmenu M, Tmenuitem OldItem, dat Odepth, Tmenuitem NewIt
   } else if (Ndepth == Odepth + 1) {
     OpenMenuItem(M, NewItem, by_mouse);
   } else
-    log(ERROR) << "twin: internal error: unsupported Tmenu traversing.\n";
+    log(ERROR) << "hedgeytty: internal error: unsupported Tmenu traversing.\n";
 }
 
 /* close the Tmenu bar */

@@ -10,8 +10,8 @@
  *
  */
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 #ifdef TW_HAVE_SIGNAL_H
 #include <signal.h>

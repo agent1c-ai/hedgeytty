@@ -16,7 +16,7 @@
 #include <signal.h>
 #include <time.h>
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 
 #ifdef TW_HAVE_UNISTD_H
 #include <unistd.h>
@@ -30,11 +30,11 @@
 #include <sys/wait.h>
 #endif
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 
 #include "version.h"
 

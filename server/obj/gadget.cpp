@@ -20,9 +20,9 @@
 #include "draw.h"      // DrawAreaWidget()
 #include "builtin.h"   // ColorFill()
 
-#include <Tw/datasizes.h>   // TW_SIZEOF_TCOLOR
-#include <Tw/Tw_defs.h>     // tpalette_n
-#include <Tw/Twstat_defs.h> // TWS_gadget_*
+#include <Ht/datasizes.h>   // TW_SIZEOF_TCOLOR
+#include <Ht/Tw_defs.h>     // tpalette_n
+#include <Ht/Twstat_defs.h> // TWS_gadget_*
 #include <Tutf/utf_32.h>    // T_UTF_32_*_BLOCK
 #include <Tutf/Tutf.h>      // Tutf_CP437_to_UTF_32
 

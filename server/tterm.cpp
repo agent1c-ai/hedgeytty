@@ -225,9 +225,9 @@ bool InitTerm(void) {
     return true;
   }
   if (shellpath) {
-    log(ERROR) << "twin: InitTerm(): " << Errstr << "\n";
+    log(ERROR) << "hedgeytty: InitTerm(): " << Errstr << "\n";
   } else {
-    log(ERROR) << "twin: required environment variable $SHELL not set!\n";
+    log(ERROR) << "hedgeytty: required environment variable $SHELL not set!\n";
   }
   return false;
 }

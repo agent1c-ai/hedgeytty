@@ -17,18 +17,18 @@
 #include "data.h"
 #include "util.h"
 
-#include <Tw/Twkeys.h>
+#include <Ht/Twkeys.h>
 #include <Tutf/Tutf.h>
 
 /* setup configuration paths */
 
 #ifndef PLUGINDIR
-#warning PLUGINDIR is not #defined, assuming "/usr/local/lib/twin"
-#define PLUGINDIR "/usr/local/lib/twin"
+#warning PLUGINDIR is not #defined, assuming "/usr/local/lib/hedgeytty"
+#define PLUGINDIR "/usr/local/lib/hedgeytty"
 #endif
 #ifndef CONFDIR
-#warning CONFDIR is not #defined, assuming "/usr/local/etc/twin"
-#define CONFDIR "/usr/local/etc/twin"
+#warning CONFDIR is not #defined, assuming "/usr/local/etc/hedgeytty"
+#define CONFDIR "/usr/local/etc/hedgeytty"
 #endif
 
 Chars plugindir = PLUGINDIR;

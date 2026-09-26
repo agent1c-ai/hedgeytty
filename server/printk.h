@@ -9,7 +9,7 @@
 #ifndef TWIN_PRINTK_H
 #define TWIN_PRINTK_H
 
-#include <Tw/Tw_defs.h> // TW_BIGBUFF
+#include <Ht/Tw_defs.h> // TW_BIGBUFF
 
 #ifndef SS
 #define SS "%." STR(TW_SMALLBUFF) "s"

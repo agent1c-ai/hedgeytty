@@ -137,16 +137,16 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am__DEPENDENCIES_1 =
-libtw_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am_libtw_la_OBJECTS = avl.lo libtw.lo md5.lo missing.lo util.lo
-libtw_la_OBJECTS = $(am_libtw_la_OBJECTS)
+libht_la_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+am_libht_la_OBJECTS = avl.lo libtw.lo md5.lo missing.lo util.lo
+libht_la_OBJECTS = $(am_libht_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-libtw_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+libht_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libtw_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(libht_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -184,8 +184,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libtw_la_SOURCES)
-DIST_SOURCES = $(libtw_la_SOURCES)
+SOURCES = $(libht_la_SOURCES)
+DIST_SOURCES = $(libht_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -246,6 +246,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -263,6 +264,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -383,11 +385,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LTLIBRARIES = libtw.la
-libtw_la_SOURCES = avl.c libtw.c md5.c missing.c util.c
-libtw_la_LDFLAGS = -version-info 2:0:0 -no-undefined
-libtw_la_LIBADD = $(LIBSOCK) $(LIBZ)
-AM_CPPFLAGS = -I$(top_srcdir)/include
+lib_LTLIBRARIES = libht.la
+libht_la_SOURCES = avl.c libtw.c md5.c missing.c util.c
+libht_la_LDFLAGS = -version-info 2:0:0 -no-undefined
+libht_la_LIBADD = $(LIBSOCK) $(LIBZ)
 all: all-am
 
 .SUFFIXES:
@@ -455,8 +456,8 @@ clean-libLTLIBRARIES:
 	echo rm -f $${locs}; \
 	$(am__rm_f) $${locs}
 
-libtw.la: $(libtw_la_OBJECTS) $(libtw_la_DEPENDENCIES) $(EXTRA_libtw_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(libtw_la_LINK) -rpath $(libdir) $(libtw_la_OBJECTS) $(libtw_la_LIBADD) $(LIBS)
+libht.la: $(libht_la_OBJECTS) $(libht_la_DEPENDENCIES) $(EXTRA_libht_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libht_la_LINK) -rpath $(libdir) $(libht_la_OBJECTS) $(libht_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

@@ -1,44 +1,48 @@
 SUBDIRS = mapscrn
 
-bin_PROGRAMS  = twattach twcat twclip twclutter twcuckoo twdialog twevent twfindtwin twlsmsgport twlsobj twsendmsg twsetroot twsysmon twterm twthreadtest
-sbin_PROGRAMS = twdm
+bin_PROGRAMS  = htattach htcat htclip htclutter htcuckoo htdialog htevent htfindtwin htlsmsgport htlsobj htsendmsg htsetroot htsysmon htterm htthreadtest hedgeytty_hitomi_bg
+sbin_PROGRAMS = htdm
 
-AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CPPFLAGS = -I$(top_srcdir)/include -DDATADIR="\"$(datadir)/hedgeytty\""
 
-twattach_SOURCES     = attach.c
-twcat_SOURCES        = cat.c
-twclip_SOURCES       = clip.c
-twclutter_SOURCES    = clutter.c
-twcuckoo_SOURCES     = cuckoo.c
-twdialog_SOURCES     = dialog.c
-twdm_SOURCES         = dm.c
-twevent_SOURCES      = event.c util.c
-twfindtwin_SOURCES   = findtwin.c
-twlsmsgport_SOURCES  = lsmsgport.c
-twlsobj_SOURCES      = lsobj.c
-twsendmsg_SOURCES    = sendmsg.c
-twsetroot_SOURCES    = setroot.c
-twsysmon_SOURCES     = sysmon.c util.c
-twterm_SOURCES       = pty.c term.c util.c
-twthreadtest_SOURCES = threadtest.c
+htattach_SOURCES     = attach.c
+htcat_SOURCES        = cat.c
+htclip_SOURCES       = clip.c
+htclutter_SOURCES    = clutter.c
+htcuckoo_SOURCES     = cuckoo.c
+htdialog_SOURCES     = dialog.c
+htdm_SOURCES         = dm.c
+htevent_SOURCES      = event.c util.c
+htfindtwin_SOURCES   = findtwin.c
+htlsmsgport_SOURCES  = lsmsgport.c
+htlsobj_SOURCES      = lsobj.c
+htsendmsg_SOURCES    = sendmsg.c
+htsetroot_SOURCES    = setroot.c
+htsysmon_SOURCES     = sysmon.c util.c
+htterm_SOURCES       = pty.c term.c util.c
+htthreadtest_SOURCES = threadtest.c
+hedgeytty_hitomi_bg_SOURCES = hitomi-bg.c
 
-twattach_LDADD     = $(LIBTW)
-twcat_LDADD        = $(LIBTW)
-twclip_LDADD       = $(LIBTW)
-twclutter_LDADD    = $(LIBTW)
-twcuckoo_LDADD     = $(LIBTW)
-twdialog_LDADD     = $(LIBTW)
-twdm_LDADD         = $(LIBTW) $(LIBTUTF) $(LIBCRYPT)
-twevent_LDADD      = $(LIBTW)
-twfindtwin_LDADD   = $(LIBTW)
-twlsmsgport_LDADD  = $(LIBTW)
-twlsobj_LDADD      = $(LIBTW)
-twsendmsg_LDADD    = $(LIBTW)
-twsetroot_LDADD    = $(LIBTW)
-twsysmon_LDADD     = $(LIBTW)
-twterm_LDADD       = $(LIBTW) $(LIBTUTF)
-twthreadtest_LDADD = $(LIBTW) $(LIBPTHREAD)
+htattach_LDADD     = $(LIBHT)
+htcat_LDADD        = $(LIBHT)
+htclip_LDADD       = $(LIBHT)
+htclutter_LDADD    = $(LIBHT)
+htcuckoo_LDADD     = $(LIBHT)
+htdialog_LDADD     = $(LIBHT)
+htdm_LDADD         = $(LIBHT) $(LIBTUTF) $(LIBCRYPT)
+htevent_LDADD      = $(LIBHT)
+htfindtwin_LDADD   = $(LIBHT)
+htlsmsgport_LDADD  = $(LIBHT)
+htlsobj_LDADD      = $(LIBHT)
+htsendmsg_LDADD    = $(LIBHT)
+htsetroot_LDADD    = $(LIBHT)
+htsysmon_LDADD     = $(LIBHT)
+htterm_LDADD       = $(LIBHT) $(LIBTUTF)
+htthreadtest_LDADD = $(LIBHT) $(LIBPTHREAD)
+hedgeytty_hitomi_bg_LDADD = $(LIBHT)
 
 install-exec-hook:
-	rm -f            $(DESTDIR)$(bindir)/twdetach
-	$(LN_S) twattach $(DESTDIR)$(bindir)/twdetach
+	rm -f            $(DESTDIR)$(bindir)/htdetach
+	$(LN_S) htattach $(DESTDIR)$(bindir)/htdetach
+	rm -f            $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg
+	$(LN_S) hedgeytty_hitomi_bg $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg

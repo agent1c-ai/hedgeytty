@@ -21,7 +21,7 @@
 #define _GNU_SOURCE
 #define _XOPEN_SOURCE
 
-#include <Tw/autoconf.h> /* for TW_HAVE_* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE_* macros */
 #include "twconfig.h"    /* for CONF_* macros */
 
 #ifdef TW_HAVE_FCNTL_H
@@ -55,7 +55,7 @@
 #endif
 #include "tty_ioctl.h"
 
-#include <Tw/Tw.h>
+#include <Ht/Tw.h>
 
 #include "term.h"
 

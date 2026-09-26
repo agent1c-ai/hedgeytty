@@ -22,7 +22,7 @@
 #include "util.h"    // Minimum()
 
 #include <Tutf/Tutf.h>      // Tutf_CP437_to_UTF_32[]
-#include <Tw/Twstat_defs.h> // TWS_window_*
+#include <Ht/Twstat_defs.h> // TWS_window_*
 
 #include <new>
 #include <cstring> // memset()

@@ -13,7 +13,7 @@
 #ifndef TW_ERRNO_H
 #define TW_ERRNO_H
 
-#include <Tw/Twtypes.h>
+#include <Ht/Twtypes.h>
 
 #define TW_EBAD_SIZES 1
 #define TW_EBAD_STRUCTS 2

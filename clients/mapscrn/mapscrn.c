@@ -10,8 +10,8 @@
  * mapscrn.c
  */
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 #include <string.h>
 #include <stdlib.h>

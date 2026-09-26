@@ -225,6 +225,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -242,6 +243,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -362,7 +364,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-SUBDIRS = Tutf Tw
+SUBDIRS = Tutf Ht
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

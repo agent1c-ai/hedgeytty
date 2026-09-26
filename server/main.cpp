@@ -49,7 +49,7 @@ char *TWDisplay, *origTWDisplay, *origTERM, *origCOLORTERM;
 char **main_argv, **orig_argv;
 uldat main_argv_usable_len;
 byte flag_secure, flag_envrc;
-const Chars flag_secure_msg = "twin: cannot exec() external programs in secure mode.\n";
+const Chars flag_secure_msg = "hedgeytty: cannot exec() external programs in secure mode.\n";
 
 String HOME;
 
@@ -123,13 +123,13 @@ static Tmsgport RunMsgPort(Tmsgport curr) {
 }
 
 static void Usage(void) {
-  fputs("Usage: twin [OPTIONS]\n"
+  fputs("Usage: hedgeytty [OPTIONS]\n"
         "Currently known options: \n"
         " -h, --help               display this help and exit\n"
         " -V, --version            output version information and exit\n"
         " --secure                 forbid starting external programs\n"
-        " --envrc                  execute ~/.config/twin/twenvrc.sh and read its output\n"
-        "                          to set environment variables (mostly useful for twdm)\n"
+        " --envrc                  execute ~/.config/hedgeytty/htenvrc.sh and read its output\n"
+        "                          to set environment variables (mostly useful for htdm)\n"
         " -s, --share              start display as shared (default)\n"
         " -x, --excl               start display as exclusive\n"
         " --nohw                   start in background without display\n"
@@ -139,13 +139,13 @@ static void Usage(void) {
         "Currently known display drivers: \n"
         "\txft[@<XDISPLAY>]\n"
         "\tX[@<XDISPLAY>]\n"
-        "\ttwin[@<TWDISPLAY>]\n"
+        "\ttwin[@<HTDISPLAY>]\n"
         "\ttty[@<tty device>]\n",
         stdout);
 }
 
 static void ShowVersion(void) {
-  fputs("twin " TWIN_VERSION_STR " with socket protocol " TW_PROTOCOL_VERSION_STR "\n", stdout);
+  fputs("hedgeytty " TWIN_VERSION_STR " with socket protocol " TW_PROTOCOL_VERSION_STR "\n", stdout);
 }
 
 static byte Check4SpecialArgs(int argc, char *argv[]) {
@@ -160,7 +160,7 @@ static byte Check4SpecialArgs(int argc, char *argv[]) {
     } else if (!strncmp(arg, "-plugindir=", 11)) {
       const char *dir = CloneStr(arg + 11);
       if (!dir) {
-        fputs("twin: Out of memory!\n", stderr);
+        fputs("hedgeytty: Out of memory!\n", stderr);
         return ttrue;
       }
       plugindir = Chars::from_c(dir);
@@ -177,7 +177,7 @@ static bool Init(void) {
 
   CheckPrivileges();
 
-  if ((origTWDisplay = getenv("TWDISPLAY"))) {
+  if ((origTWDisplay = getenv("HTDISPLAY"))) {
     origTWDisplay = strdup(origTWDisplay);
   }
   if ((origTERM = getenv("TERM"))) {
@@ -264,7 +264,7 @@ int main(int argc, char *argv[]) {
 #ifdef CONF__ALLOC
   /* do this as soon as possible */
   if (!InitAlloc()) {
-    fputs("twin: InitAlloc() failed: internal error!\n", stderr);
+    fputs("hedgeytty: InitAlloc() failed: internal error!\n", stderr);
     return 1;
   }
 #endif
@@ -272,7 +272,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   if (!(orig_argv = CloneStrList(main_argv + 1))) {
-    fputs("twin: Out of memory!\n", stderr);
+    fputs("hedgeytty: Out of memory!\n", stderr);
     return 1;
   }
 

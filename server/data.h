@@ -11,8 +11,8 @@
 
 #include "stl/chars.h"
 
-#include <Tw/datatypes.h> // byte, udat, tcolor, trune
-#include <Tw/Tw_defs.h>   // tpalette_n
+#include <Ht/datatypes.h> // byte, udat, tcolor, trune
+#include <Ht/Tw_defs.h>   // tpalette_n
 
 // directory containing plugins: libhw_*.* librcparse.* libsocket.* libterm.*
 extern Chars plugindir;

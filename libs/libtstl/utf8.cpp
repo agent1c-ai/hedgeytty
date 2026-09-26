@@ -8,7 +8,7 @@
  */
 #include "stl/utf8.h"
 #include "stl/chars.h"
-#include <Tw/autoconf.h> /* for TW_HAVE* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE* macros */
 
 #ifdef TW_HAVE_ARPA_INET_H
 #include <arpa/inet.h> // htonl()

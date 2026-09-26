@@ -15,8 +15,8 @@
 #include <string.h>
 #include <signal.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 #include "version.h"
 
 static char *MYname;
@@ -34,12 +34,12 @@ static void Usage(byte detach) {
           "  -v, --verbose            verbose output (default)\n"
           "  -q, --quiet              quiet: don't report messages from twin server\n"
           "  -f, --force              force running even with wrong protocol version\n"
-          "  --twin@<TWDISPLAY>       specify server to contact (default is $TWDISPLAY)\n"
+          "  --twin@<HTDISPLAY>       specify server to contact (default is $HTDISPLAY)\n"
           "  --hw=<display>[,options] start the given display driver\n"
           "Currently known display drivers: \n"
           "\tX[@<XDISPLAY>]\n"
           "\txft[@<XDISPLAY>]\n"
-          "\ttwin[@<TWDISPLAY>]\n"
+          "\ttwin[@<HTDISPLAY>]\n"
           "\ttty[@<tty device>]\n",
           MYname, detach ? "" : "--hw=<display> [...]", detach ? "" : " (default)",
           detach ? " (default)" : "");

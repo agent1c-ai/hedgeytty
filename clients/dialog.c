@@ -14,8 +14,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 #define COD_QUIT (udat)1
 

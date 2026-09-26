@@ -33,10 +33,10 @@
 #include "version.h"
 #include "unaligned.h"
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -44,8 +44,8 @@
 #include <signal.h>
 
 #ifndef PLUGINDIR
-#warning PLUGINDIR is not #defined, assuming "/usr/local/lib/twin"
-#define PLUGINDIR "/usr/local/lib/twin"
+#warning PLUGINDIR is not #defined, assuming "/usr/local/lib/hedgeytty"
+#define PLUGINDIR "/usr/local/lib/hedgeytty"
 #endif
 
 Chars plugindir = PLUGINDIR;
@@ -984,14 +984,14 @@ static void Usage(void) NOTHROW {
         " -v, --verbose            verbose output (default)\n"
         " -q, --quiet              quiet - don't report messages from twin server\n"
         " -f, --force              force running even with wrong protocol version\n"
-        " --twin@<TWDISPLAY>       specify server to contact instead of $TWDISPLAY\n"
+        " --twin@<HTDISPLAY>       specify server to contact instead of $HTDISPLAY\n"
         " --hw=<display>[,options] start the given display (only one --hw=... allowed)\n"
         "                          (default: autoprobe all displays until one succeeds)\n"
         " --plugindir=DIRECTORY    set directory where to look for --hw=... libraries\n"
         "Currently known display drivers: \n"
         "\txft[@<XDISPLAY>]\n"
         "\tX[@<XDISPLAY>]\n"
-        "\ttwin[@<TWDISPLAY>]\n"
+        "\ttwin[@<HTDISPLAY>]\n"
         "\ttty[@<tty device>]\n",
         stdout);
 }
@@ -1164,7 +1164,7 @@ int main(int argc, char *argv[]) {
   }
 #endif
 
-  origTWDisplay = CloneStr(getenv("TWDISPLAY"));
+  origTWDisplay = CloneStr(getenv("HTDISPLAY"));
   origTERM = CloneStr(getenv("TERM"));
   origCOLORTERM = CloneStr(getenv("COLORTERM"));
 

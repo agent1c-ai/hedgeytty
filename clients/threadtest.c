@@ -19,8 +19,8 @@
 
 #include <pthread.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 tmsgport Thrd_MsgPort;
 tmenu Thrd_Menu;

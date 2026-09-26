@@ -31,9 +31,9 @@
  * "twconfig.h" and <Tw/osincludes.h> early to pull in TW_HAVE_* and system headers
  * necessary to include <sys/socket.h> under FreeBSD.
  */
-#include <Tw/autoconf.h> /* for TW_HAVE* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE* macros */
 #include "twconfig.h"    /* for CONF_* macros */
-#include <Tw/osincludes.h>
+#include <Ht/osincludes.h>
 
 #ifdef TW_HAVE_SIGNAL_H
 #include <signal.h>
@@ -66,12 +66,12 @@
 #include <sys/ioctl.h>
 #endif
 
-#include <Tw/Tw.h>
+#include <Ht/Tw.h>
 
-#include <Tw/Twavl.h>
-#include <Tw/Twerrno.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Twavl.h>
+#include <Ht/Twerrno.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 
 #include "mutex.h"
 
@@ -1061,8 +1061,8 @@ static byte MagicNumbers(tw_d TwD) {
 }
 
 #define digestLen 16     /* hardcoded in MD5 routines */
-#define hAuthLen 256     /* length of ~/.TwinAuth */
-#define challengeLen 512 /* length of ~/.TwinAuth + random data */
+#define hAuthLen 256     /* length of ~/.HedgeyTTYAuth */
+#define challengeLen 512 /* length of ~/.HedgeyTTYAuth + random data */
 
 static byte MagicChallenge(tw_d TwD) {
   struct MD5Context ctx;
@@ -1090,11 +1090,11 @@ static byte MagicChallenge(tw_d TwD) {
   }
 
   len = strlen(home);
-  if (len > hAuthLen - 11)
+  if (len > hAuthLen - 16)
     len = hAuthLen - 11;
 
   Tw_CopyMem(home, data, len);
-  Tw_CopyMem("/.TwinAuth", data + len, 11);
+  Tw_CopyMem("/.HedgeyTTYAuth", data + len, 16);
   if ((fd = open(data, O_RDONLY)) < 0) {
     Tw_FreeMem(data);
     Errno = TW_ENO_AUTH;
@@ -1167,7 +1167,7 @@ static udat copyToSockaddrUn(const char *src, struct sockaddr_un *addr, udat pos
 
 /**
  * opens a connection to server; TwDisplay is the server to contact;
- * if NULL the environment variable $TWDISPLAY is used
+ * if NULL the environment variable $HTDISPLAY is used
  */
 tw_d Tw_Open(const char *TwDisplay) {
   tw_d TwD;
@@ -1176,7 +1176,7 @@ tw_d Tw_Open(const char *TwDisplay) {
   unsigned i;
   byte gzip = tfalse, handshake = tfalse;
 
-  if (!TwDisplay && (!(TwDisplay = getenv("TWDISPLAY")) || !*TwDisplay)) {
+  if (!TwDisplay && (!(TwDisplay = getenv("HTDISPLAY")) || !*TwDisplay)) {
     CommonErrno = TW_ENO_DISPLAY;
     return (tw_d)0;
   }
@@ -1203,7 +1203,7 @@ tw_d Tw_Open(const char *TwDisplay) {
       addr.sun_family = AF_UNIX;
 
       len = copyToSockaddrUn(tmpdir(), &addr, 0);
-      len = copyToSockaddrUn("/.Twin", &addr, len);
+      len = copyToSockaddrUn("/.HedgeyTTY", &addr, len);
       len = copyToSockaddrUn(TwDisplay, &addr, len);
 
       result = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
@@ -1483,11 +1483,11 @@ TW_ATTR_FN_CONST const char *Tw_StrError(const tw_d TwD, uldat e) {
   case TW_EBAD_STRUCTS:
     return "internal error: structs are not packed! Please contact the author.";
   case TW_ENO_DISPLAY:
-    return "TWDISPLAY is not set";
+    return "HTDISPLAY is not set";
   case TW_EBAD_DISPLAY:
-    return "badly formed TWDISPLAY";
+    return "badly formed HTDISPLAY";
   case TW_ENO_AUTH:
-    return "bad or missing authorization file ~/.TwinAuth, cannot connect";
+    return "bad or missing authorization file ~/.HedgeyTTYAuth, cannot connect";
   case TW_ESYS_CANNOT_CONNECT:
     return "failed to connect: ";
   case TW_ESYS_NO_MEM:
@@ -1507,13 +1507,13 @@ TW_ATTR_FN_CONST const char *Tw_StrError(const tw_d TwD, uldat e) {
   case TW_ESERVER_BAD_FUNCTION:
     return "function is not a possible server function";
   case TW_ESERVER_DENIED_CONNECT:
-    return "server denied permission to connect, file ~/.TwinAuth may be wrong";
+    return "server denied permission to connect, file ~/.HedgeyTTYAuth may be wrong";
   case TW_EGZIP_BAD_PROTOCOL:
     return "got invalid data from server, gzip format violated";
   case TW_EGZIP_INTERNAL:
     return "internal gzip error, panic!";
   case TW_ENO_HOST:
-    return "unknown host in TWDISPLAY: ";
+    return "unknown host in HTDISPLAY: ";
   case TW_ESERVER_BAD_VERSION:
     return "server has incompatible protocol version, impossible to connect";
   case TW_ESERVER_BAD_RETURN:

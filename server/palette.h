@@ -9,8 +9,8 @@
 #ifndef TWIN_PALETTE_H
 #define TWIN_PALETTE_H
 
-#include <Tw/datatypes.h> // byte, udat, tcolor, trune
-#include <Tw/Tw_defs.h>   // tpalette_n
+#include <Ht/datatypes.h> // byte, udat, tcolor, trune
+#include <Ht/Tw_defs.h>   // tpalette_n
 
 extern const trgb Palette[tpalette_n];
 

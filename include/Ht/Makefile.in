@@ -90,7 +90,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = include/Tw
+subdir = include/Ht
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/m4/ltargz.m4 $(top_srcdir)/m4/ltdl.m4 \
@@ -103,7 +103,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 	$(top_srcdir)/admin/tw_output.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(twinclude_HEADERS) \
+DIST_COMMON = $(srcdir)/Makefile.am $(htinclude_HEADERS) \
 	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h
@@ -154,8 +154,8 @@ am__uninstall_files_from_dir = { \
   || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
-am__installdirs = "$(DESTDIR)$(twincludedir)"
-HEADERS = $(twinclude_HEADERS)
+am__installdirs = "$(DESTDIR)$(htincludedir)"
+HEADERS = $(htinclude_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -211,6 +211,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -228,6 +229,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -348,10 +350,10 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-twincludedir = $(includedir)/Tw
-twinclude_HEADERS = \
+htincludedir = $(includedir)/Ht
+htinclude_HEADERS = \
   Tw++.h Tw.h Tw1.h Tw_defs.h Twavl.h Twerrno.h Twkeys.h Twstat.h Twstat_defs.h Twtypes.h \
-  alias1.h alias.h autoconf.h common1_gen.h common_gen.h compiler.h datasizes.h datatypes.h \
+  alias1.h alias.h autoconf.h branding.h common1_gen.h common_gen.h compiler.h datasizes.h datatypes.h \
   missing.h mouse.h osincludes.h pagesize.h prefix.h proto1_gen.h proto_gen.h stattypes.h \
   unprefix.h version.h
 
@@ -367,9 +369,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign include/Tw/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign include/Ht/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign include/Tw/Makefile
+	  $(AUTOMAKE) --foreign include/Ht/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -395,27 +397,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-twincludeHEADERS: $(twinclude_HEADERS)
+install-htincludeHEADERS: $(htinclude_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(twinclude_HEADERS)'; test -n "$(twincludedir)" || list=; \
+	@list='$(htinclude_HEADERS)'; test -n "$(htincludedir)" || list=; \
 	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(twincludedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(twincludedir)" || exit 1; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(htincludedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(htincludedir)" || exit 1; \
 	fi; \
 	for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  echo "$$d$$p"; \
 	done | $(am__base_list) | \
 	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(twincludedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(twincludedir)" || exit $$?; \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(htincludedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(htincludedir)" || exit $$?; \
 	done
 
-uninstall-twincludeHEADERS:
+uninstall-htincludeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(twinclude_HEADERS)'; test -n "$(twincludedir)" || list=; \
+	@list='$(htinclude_HEADERS)'; test -n "$(htincludedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(twincludedir)'; $(am__uninstall_files_from_dir)
+	dir='$(DESTDIR)$(htincludedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -506,7 +508,7 @@ check-am: all-am
 check: check-am
 all-am: Makefile $(HEADERS)
 installdirs:
-	for dir in "$(DESTDIR)$(twincludedir)"; do \
+	for dir in "$(DESTDIR)$(htincludedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-am
@@ -559,7 +561,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-twincludeHEADERS
+install-data-am: install-htincludeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -603,7 +605,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-twincludeHEADERS
+uninstall-am: uninstall-htincludeHEADERS
 
 .MAKE: install-am install-strip
 
@@ -612,14 +614,14 @@ uninstall-am: uninstall-twincludeHEADERS
 	distclean-generic distclean-libtool distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	install-twincludeHEADERS installcheck installcheck-am \
+	install-exec install-exec-am install-htincludeHEADERS \
+	install-html install-html-am install-info install-info-am \
+	install-man install-pdf install-pdf-am install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
 	installdirs maintainer-clean maintainer-clean-generic \
 	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
 	ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-twincludeHEADERS
+	uninstall-htincludeHEADERS
 
 .PRECIOUS: Makefile
 

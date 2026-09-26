@@ -29,9 +29,9 @@
 #include "common.h"
 #include "tty.h"
 
-#include <Tw/Tw.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 #include <Tutf/Tutf.h>
 
 /*

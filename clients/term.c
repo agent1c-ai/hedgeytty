@@ -10,9 +10,9 @@
  *
  */
 
-#include <Tw/autoconf.h>
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/autoconf.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 #include <Tutf/Tutf.h>
 
 #ifdef TW_HAVE_SIGNAL_H

@@ -7,14 +7,14 @@
 #define Tw(arg) Tw_##arg
 #define TW(arg) TW_##arg
 #ifndef TW_AUTOCONF_H
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #endif
 #else
 #define TW_PREFIX 0
 #define Tw(arg) arg
 #define TW(arg) arg
 #ifndef TW_TWAUTOCONF_H
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #endif
 #endif
 

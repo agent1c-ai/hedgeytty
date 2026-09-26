@@ -2,8 +2,8 @@
 #ifndef TW_MISSING_H
 #define TW_MISSING_H
 
-#include <Tw/prefix.h>
-#include <Tw/autoconf.h>
+#include <Ht/prefix.h>
+#include <Ht/autoconf.h>
 
 #ifndef TW_HAVE_GETENV
 char *Tw_missing_getenv(TW(CONST) char *name);
@@ -50,6 +50,6 @@ int Tw_option_strcmp(const char *s1, const char *s2);
 
 int Tw_option_strncmp(const char *s1, const char *s2, size_t n);
 
-#include <Tw/unprefix.h>
+#include <Ht/unprefix.h>
 
 #endif /* TW_MISSING_H */

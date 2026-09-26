@@ -32,6 +32,8 @@ systemctl is-active gpm
 
 - gpm and X/Wayland fighting over the same device can cause oddities; HedgeyTTY
   targets **multi-user / text console** sessions (`multi-user.target`).
-- Twin menus: TurboVision-style (always-visible menubar, left-click) is the
-  HedgeyTTY default in `config/twinrc`.
+- Menus: TurboVision-style (always-visible menubar, left-click) is the
+  HedgeyTTY default in `hedgeyttyrc` / `~/.config/hedgeytty/hedgeyttyrc`.
 - Without gpm, keyboard still works (`Pause` / `F12` open the menu).
+- HedgeyTTY targets the text console; stock apt `twin` can coexist via
+  different sockets (`/tmp/.HedgeyTTY:*` vs `/tmp/.Twin:*`).

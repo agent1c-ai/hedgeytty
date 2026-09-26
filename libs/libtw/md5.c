@@ -16,7 +16,7 @@
  */
 
 #include "md5.h"
-#include <Tw/datasizes.h> /* TW_IS_LITTLE_ENDIAN */
+#include <Ht/datasizes.h> /* TW_IS_LITTLE_ENDIAN */
 
 #ifdef TW_HAVE_STRING_H
 #include <string.h> /* memcpy() */

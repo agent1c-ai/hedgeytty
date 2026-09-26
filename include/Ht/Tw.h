@@ -71,10 +71,10 @@ extern "C" {
  }
 #endif
 
-#include <Tw/Tw_defs.h>
-#include <Tw/Twtypes.h>
-#include <Tw/missing.h>
-#include <Tw/mouse.h>
+#include <Ht/Tw_defs.h>
+#include <Ht/Twtypes.h>
+#include <Ht/missing.h>
+#include <Ht/mouse.h>
 
 /** type for groups of radio buttons */
 typedef tobj tgroup;
@@ -347,11 +347,11 @@ byte Tw_FindLFunction(tdisplay TwD, ...);
 
 #define Tw_ChangeFieldObj Tw_ChangeField
 
-#include <Tw/common_gen.h>
-#include <Tw/proto_gen.h>
-#include <Tw/alias.h>
+#include <Ht/common_gen.h>
+#include <Ht/proto_gen.h>
+#include <Ht/alias.h>
 
-#include <Tw/Tw1.h>
+#include <Ht/Tw1.h>
 
 #ifdef __cplusplus
 }

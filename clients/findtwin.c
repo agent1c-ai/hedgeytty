@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 
 #ifdef TW_HAVE_DIRENT_H
 #include <dirent.h>
@@ -25,13 +25,13 @@
 #endif
 #endif
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 TW_DECL_MAGIC(findtwin_magic);
 
 static void try_TwOpen(const char *dpy) {
-  if (dpy || (dpy = getenv("TWDISPLAY"))) {
+  if (dpy || (dpy = getenv("HTDISPLAY"))) {
     if (TwOpen(dpy)) {
       printf("%s\n", dpy);
       exit(0);
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  /* then, check for environment TWDISPLAY */
+  /* then, check for environment HTDISPLAY */
   try_TwOpen(NULL);
 
 #if defined(TW_HAVE_SCANDIR) && defined(TW_HAVE_ALPHASORT)

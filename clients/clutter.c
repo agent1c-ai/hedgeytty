@@ -9,8 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 static tmsgport Clutter_MsgPort;
 static tmenu Clutter_Menu;

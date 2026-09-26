@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <errno.h>
 #include <cdaudio.h>
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 #define COD_QUIT (udat)1
 #define CD_PLAY (udat)2

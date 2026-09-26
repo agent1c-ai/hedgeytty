@@ -26,12 +26,12 @@ libhw_xft_la_SOURCES  = hw_xft.cpp
 libhw_tty_la_SOURCES  = hw_tty.cpp
 libhw_twin_la_SOURCES = hw_twin.cpp
 
-AM_LDFLAGS            = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION)
-libhw_x11_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION) $(X11_LDFLAGS)
-libhw_xft_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION) $(X11_LDFLAGS)
+AM_LDFLAGS            = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH)
+libhw_x11_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH) $(X11_LDFLAGS)
+libhw_xft_la_LDFLAGS  = -export-dynamic -export-symbols-regex '^(Init|Quit)Module$$' -release $(PACKAGE_VERSION_MAJOR).$(PACKAGE_VERSION_MINOR).$(PACKAGE_VERSION_PATCH) $(X11_LDFLAGS)
 
 libhw_display_la_LIBADD =
 libhw_x11_la_LIBADD   = $(LIBTUTF) $(LIBTSTL) $(LIBX11)
 libhw_xft_la_LIBADD   = $(LIBTUTF) $(LIBTSTL) $(LIBX11) $(XFT_LIBS) $(LIBXFT)
 libhw_tty_la_LIBADD   = $(LIBTUTF) $(LIBTSTL) $(LIBTERMCAP) $(LIBGPM)
-libhw_twin_la_LIBADD  = $(LIBTUTF) $(LIBTSTL) $(LIBTW) $(LIBZ)
+libhw_twin_la_LIBADD  = $(LIBTUTF) $(LIBTSTL) $(LIBHT) $(LIBZ)

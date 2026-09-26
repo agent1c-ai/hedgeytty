@@ -2,7 +2,7 @@
 #define TW_DATASIZES_H
 
 #ifndef TWTWAUTOCONF_H
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #endif
 
 #if defined(TW_HAVE_LIMITS_H)

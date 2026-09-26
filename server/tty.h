@@ -9,7 +9,7 @@
 #ifndef TWIN_TTY_H
 #define TWIN_TTY_H
 
-#include <Tw/datatypes.h>
+#include <Ht/datatypes.h>
 #include "stl/string.h"
 
 /* tty_data->Flags */

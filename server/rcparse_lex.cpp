@@ -1607,7 +1607,7 @@ case 88:
 YY_RULE_SETUP
 #line 179 "rcparse.l"
 {
-            snprintf(errbuf, sizeof(errbuf), "twin: %.200s:%d: invalid identifier `%s'\n",
+            snprintf(errbuf, sizeof(errbuf), "hedgeytty: %.200s:%d: invalid identifier `%s'\n",
                 FILE_NAME, LINE_NO, yytext);
             YY_FATAL_ERROR(errbuf);
         }
@@ -1680,11 +1680,11 @@ YY_RULE_SETUP
         size_t buf_len = 256 + strlen(yytext);
         char *buf = (char *)AllocMem(buf_len);
         if (buf) {
-            snprintf(buf, buf_len, "twin: %.200s:%d: unterminated string:\n%s\n",
+            snprintf(buf, buf_len, "hedgeytty: %.200s:%d: unterminated string:\n%s\n",
                 FILE_NAME, LINE_NO, yytext);
                 YY_FATAL_ERROR(buf);
             } else {
-            YY_FATAL_ERROR("twin: unterminated string\n");
+            YY_FATAL_ERROR("hedgeytty: unterminated string\n");
         }
     }
 	YY_BREAK
@@ -1698,7 +1698,7 @@ YY_RULE_SETUP
 #line 256 "rcparse.l"
 {
             unsigned char ch = yytext[0];
-            snprintf(errbuf, sizeof(errbuf), "twin: %.200s:%d: illegal character 0x%02X",
+            snprintf(errbuf, sizeof(errbuf), "hedgeytty: %.200s:%d: illegal character 0x%02X",
                 FILE_NAME, LINE_NO, ch);
             size_t errbuf_len = strlen(errbuf);
             if (ch >= 32 && ch < 127 && errbuf_len <= sizeof(errbuf) - 6) {
@@ -2732,7 +2732,7 @@ int set_yy_file(const char *path) {
         return 1;
 
     if (read_stack_curr >= MAX_READ_DEPTH) {
-        fprintf(stderr, "twin: %s:%d: `Read' commands nested too deeply!\n",
+        fprintf(stderr, "hedgeytty: %s:%d: `Read' commands nested too deeply!\n",
             FILE_NAME, LINE_NO);
         return 0;
     }

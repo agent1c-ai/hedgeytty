@@ -14,7 +14,7 @@
 #define TWIN_GROUP_H
 
 #include "obj/fwd.h"
-#include <Tw/datatypes.h>
+#include <Ht/datatypes.h>
 
 /* Tgroup -- group of Tgadget:s */
 

@@ -9,7 +9,7 @@
 #define TWIN_TTY_IOCTL_H
 
 #ifndef TW_TWAUTOCONF_H
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #endif
 
 #if defined(TW_HAVE_TERMIOS_H)

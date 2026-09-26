@@ -72,7 +72,6 @@ am__make_dryrun = (target_option=n; $(am__make_running_with_option))
 am__make_keepgoing = (target_option=k; $(am__make_running_with_option))
 am__rm_f = rm -f $(am__rm_f_notfound)
 am__rm_rf = rm -rf $(am__rm_f_notfound)
-pkgdatadir = $(datadir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
 pkglibdir = $(libdir)/@PACKAGE@
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
@@ -103,8 +102,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(dist_pkgsysconf_DATA) \
-	$(am__DIST_COMMON)
+	$(am__configure_deps) $(dist_pkgdata_DATA) \
+	$(dist_pkgsysconf_DATA) $(am__DIST_COMMON)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
@@ -164,9 +163,9 @@ am__uninstall_files_from_dir = { \
   || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
-am__installdirs = "$(DESTDIR)$(pkgsysconfdir)" \
-	"$(DESTDIR)$(pkgdatadir)"
-DATA = $(dist_pkgsysconf_DATA) $(pkgdata_DATA)
+am__installdirs = "$(DESTDIR)$(pkgdatadir)" \
+	"$(DESTDIR)$(pkgsysconfdir)" "$(DESTDIR)$(pkgdatadir)"
+DATA = $(dist_pkgdata_DATA) $(dist_pkgsysconf_DATA) $(pkgdata_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -198,8 +197,8 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/admin/compile \
 	$(top_srcdir)/admin/config.sub $(top_srcdir)/admin/install-sh \
 	$(top_srcdir)/admin/ltmain.sh $(top_srcdir)/admin/missing \
 	COPYING COPYING.LIB INSTALL README admin/compile \
-	admin/config.guess admin/config.sub admin/depcomp \
-	admin/install-sh admin/ltmain.sh admin/missing
+	admin/config.guess admin/config.sub admin/install-sh \
+	admin/ltmain.sh admin/missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -246,6 +245,7 @@ am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
 distcleancheck_listfiles = \
   find . \( -type f -a \! \
             \( -name .nfs* -o -name .smb* -o -name .__afs* \) \) -print
+pkgdatadir = $(datadir)/hedgeytty
 pkglibexecdir = $(pkglibdir)
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -283,6 +283,7 @@ EGREP = @EGREP@
 ETAGS = @ETAGS@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
+FILECMD = @FILECMD@
 GREP = @GREP@
 INCLTDL = @INCLTDL@
 INSTALL = @INSTALL@
@@ -300,6 +301,7 @@ LIBADD_SHL_LOAD = @LIBADD_SHL_LOAD@
 LIBCRYPT = @LIBCRYPT@
 LIBDL = @LIBDL@
 LIBGPM = @LIBGPM@
+LIBHT = @LIBHT@
 LIBLTDL = @LIBLTDL@
 LIBOBJS = @LIBOBJS@
 LIBPTHREAD = @LIBPTHREAD@
@@ -422,9 +424,10 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = docs include libs clients test server
 ACLOCAL_AMFLAGS = -I m4
-pkgsysconfdir = $(sysconfdir)/twin
-pkgdata_DATA = BUGS COPYING COPYING.LIB Changelog.txt INSTALL README README.porting twin-current.lsm
-dist_pkgsysconf_DATA = twenvrc.sh twinrc
+pkgsysconfdir = $(sysconfdir)/hedgeytty
+pkgdata_DATA = BUGS COPYING COPYING.LIB Changelog.txt INSTALL README.md README.twin.md twin-current.lsm
+dist_pkgsysconf_DATA = htenvrc.sh hedgeyttyrc
+dist_pkgdata_DATA = assets/hitomi-icon.png
 all: all-recursive
 
 .SUFFIXES:
@@ -470,6 +473,27 @@ clean-libtool:
 
 distclean-libtool:
 	-rm -f libtool config.lt
+install-dist_pkgdataDATA: $(dist_pkgdata_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(dist_pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgdatadir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgdatadir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgdatadir)" || exit $$?; \
+	done
+
+uninstall-dist_pkgdataDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_pkgdata_DATA)'; test -n "$(pkgdatadir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgdatadir)'; $(am__uninstall_files_from_dir)
 install-dist_pkgsysconfDATA: $(dist_pkgsysconf_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(dist_pkgsysconf_DATA)'; test -n "$(pkgsysconfdir)" || list=; \
@@ -827,7 +851,7 @@ check: check-recursive
 all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(pkgsysconfdir)" "$(DESTDIR)$(pkgdatadir)"; do \
+	for dir in "$(DESTDIR)$(pkgdatadir)" "$(DESTDIR)$(pkgsysconfdir)" "$(DESTDIR)$(pkgdatadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -882,7 +906,8 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-dist_pkgsysconfDATA install-pkgdataDATA
+install-data-am: install-dist_pkgdataDATA install-dist_pkgsysconfDATA \
+	install-pkgdataDATA
 
 install-dvi: install-dvi-recursive
 
@@ -929,7 +954,8 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_pkgsysconfDATA uninstall-pkgdataDATA
+uninstall-am: uninstall-dist_pkgdataDATA uninstall-dist_pkgsysconfDATA \
+	uninstall-pkgdataDATA
 
 .MAKE: $(am__recursive_targets) install-am install-exec-am \
 	install-strip
@@ -942,16 +968,17 @@ uninstall-am: uninstall-dist_pkgsysconfDATA uninstall-pkgdataDATA
 	distclean-generic distclean-libtool distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-dist_pkgsysconfDATA install-dvi \
-	install-dvi-am install-exec install-exec-am install-exec-hook \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-pkgdataDATA \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs installdirs-am maintainer-clean \
+	install-data-am install-dist_pkgdataDATA \
+	install-dist_pkgsysconfDATA install-dvi install-dvi-am \
+	install-exec install-exec-am install-exec-hook install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-pkgdataDATA install-ps \
+	install-ps-am install-strip installcheck installcheck-am \
+	installdirs installdirs-am maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-generic \
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-dist_pkgsysconfDATA \
-	uninstall-pkgdataDATA
+	uninstall-am uninstall-dist_pkgdataDATA \
+	uninstall-dist_pkgsysconfDATA uninstall-pkgdataDATA
 
 .PRECIOUS: Makefile
 
@@ -965,48 +992,12 @@ install-exec-hook:
 	  CMD_LDCONFIG="" ; \
 	fi; \
 	if test "x$$CMD_LDCONFIG" != x ; then \
-	  CMD_ERR1=""; \
-	  CMD_ERR2=""; \
-	  CMD_ERR3=""; \
-	  if id 2>/dev/null | $(EGREP) "^uid=0" >/dev/null 2>&1 ; then \
-	    true; \
-	  else \
-	    CMD_ERR1="installing with non-root user \"`whoami 2>/dev/null`\""; \
-	  fi; \
-	  if test "x$(DESTDIR)" != x ; then \
-	    CMD_ERR2="installing to non-null DESTDIR = \"$(DESTDIR)\""; \
-	  fi; \
-	  if test "x$(host_triplet)" != "x$(build_triplet)" ; then \
-	    CMD_ERR3="cross-compile detected, host system \"$(host_triplet)\" != build system \"$(build_triplet)\""; \
-	  fi; \
-	  if test "x$$CMD_ERR1$$CMD_ERR2$$CMD_ERR3" = x ; then \
+	  if id 2>/dev/null | $(EGREP) "^uid=0" >/dev/null 2>&1 && test "x$(DESTDIR)" = x && test "x$(host_triplet)" = "x$(build_triplet)" ; then \
 	    echo " $$CMD_LDCONFIG" ; \
 	    $$CMD_LDCONFIG ; \
 	  else \
-	    echo "[33;1m==================================================================="; \
-	    echo "=========================== WARNING ==============================="; \
-	    echo "==================================================================="; \
-	    echo "===                                                             ==="; \
-	    echo "===    cannot run required command \"$$CMD_LDCONFIG\" now. reasons:     ==="; \
-	    echo "===                                                             ==="; \
-	    if test "x$$CMD_ERR1" != x ; then \
-	      echo "===   * $$CMD_ERR1"; \
-	    fi; \
-	    if test "x$$CMD_ERR2" != x ; then \
-	      echo "===   * $$CMD_ERR2"; \
-	    fi; \
-	    if test "x$$CMD_ERR3" != x ; then \
-	      echo "===   * $$CMD_ERR3"; \
-	    fi; \
-	    echo "===                                                             ==="; \
-	    echo "=== remember to run \"$$CMD_LDCONFIG\" with root privileges (or reboot) ==="; \
-	    echo "===       after you install twin into its final location,       ==="; \
-	    echo "===    otherwise you may receive \"library not found\" errors     ==="; \
-	    echo "===                                                             ==="; \
-	    echo "==================================================================="; \
-	    echo "==================================================================="; \
-	    echo "===================================================================[0m"; \
-          fi; \
+	    echo "NOTE: run ldconfig after install if libraries are not found" ; \
+	  fi; \
 	fi
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

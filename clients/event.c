@@ -12,9 +12,9 @@
 
 #include <stdio.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
-#include <Tw/Twkeys.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
+#include <Ht/Twkeys.h>
 
 static tmsgport Event_MsgPort;
 static tmenu Event_Menu;

@@ -9,7 +9,7 @@
 
 #include "util.h"
 
-#include <Tw/autoconf.h> /* for TW_HAVE_* macros */
+#include <Ht/autoconf.h> /* for TW_HAVE_* macros */
 
 #ifdef TW_HAVE_FCNTL_H
 #include <fcntl.h>

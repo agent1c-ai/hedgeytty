@@ -14,7 +14,7 @@
 
 #include "twconfig.h"
 
-#include <Tw/pagesize.h>
+#include <Ht/pagesize.h>
 
 #ifdef TW_HAVE_SYS_STAT_H
 #include <sys/stat.h>
@@ -90,7 +90,7 @@ static size_t full_read(int fd, byte *data, size_t len) {
 static void shm_shrink_error(void) {
 
   may_shrink = tfalse;
-  log(ERROR) << "twin: shm_shrink(): ReAllocMem() relocated memory while shrinking! \n"
+  log(ERROR) << "hedgeytty: shm_shrink(): ReAllocMem() relocated memory while shrinking! \n"
 #ifdef CONF__ALLOC
                 "      This should not happen! Please report.\n"
 #endif
@@ -119,7 +119,7 @@ byte shm_init(size_t len) {
     TW_PAGE_SIZE = getpagesize();
 
   pathlen = CopyToSockaddrUn(TmpDir.data(), &addr, 0);
-  pathlen = CopyToSockaddrUn("/.Twin_shm", &addr, pathlen);
+  pathlen = CopyToSockaddrUn("/.HedgeyTTY_shm", &addr, pathlen);
   pathlen = CopyToSockaddrUn(TWDisplay, &addr, pathlen);
 
   unlink(shmfile);
@@ -382,7 +382,7 @@ void *shm_malloc_or_die(size_t len) {
   void *m = shm_malloc(len);
   if (m || !len)
     return m;
-  log(ERROR) << "twin: RC: Out of shared memory!\n";
+  log(ERROR) << "hedgeytty: RC: Out of shared memory!\n";
   exit(1);
 }
 

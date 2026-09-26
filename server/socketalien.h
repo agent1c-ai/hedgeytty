@@ -505,7 +505,7 @@ static void alienMultiplexB(SockCtx &ctx, uldat id) {
     } else /* (n >= TW_MAX_ARGS_N) */ {
       if (!warned) {
         warned = ttrue;
-        log(ERROR) << "twin: alienMultiplexB(): got a call with " << n << " args, only "
+        log(ERROR) << "hedgeytty: alienMultiplexB(): got a call with " << n << " args, only "
                    << TW_MAX_ARGS_N << " supported!\n";
       }
       fail = -fail;

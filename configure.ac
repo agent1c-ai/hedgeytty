@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
-AC_INIT([twin],[1.0.0],[BUG-REPORT-ADDRESS])
+AC_INIT([hedgeytty],[1.0.0+hedgey.1],[BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([server/main.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AC_CONFIG_MACRO_DIR([m4])
@@ -317,7 +317,8 @@ if test "$enable_socket_gz" = yes; then
 fi
 AC_SUBST(LIBTSTL,    '$(top_builddir)/libs/libtstl/libtstl.la')
 AC_SUBST(LIBTUTF,    '$(top_builddir)/libs/libtutf/libtutf.la')
-AC_SUBST(LIBTW,      '$(top_builddir)/libs/libtw/libtw.la')
+AC_SUBST(LIBHT, '$(top_builddir)/libs/libtw/libht.la')
+AC_SUBST(LIBTW, '$(LIBHT)')
 
 LIBS=
 
@@ -337,8 +338,8 @@ AC_SUBST(LDFLAGS_BIN_EXPORT_DYNAMIC, "$LDFLAGS_BIN_EXPORT_DYNAMIC")
 
 AC_CONFIG_FILES([
       Makefile clients/Makefile clients/mapscrn/Makefile contrib/Makefile contrib/twcd/Makefile \
-      docs/Makefile include/Makefile include/Tutf/Makefile include/Tw/Makefile \
-      include/version.h include/Tutf/version.h include/Tw/version.h \
+      docs/Makefile include/Makefile include/Tutf/Makefile include/Ht/Makefile \
+      include/version.h include/Tutf/version.h include/Ht/version.h \
       libs/Makefile libs/libltdl/Makefile libs/libtstl/Makefile \
       libs/libtutf/Makefile libs/libtw/Makefile server/Makefile server/hw/Makefile \
       test/Makefile])

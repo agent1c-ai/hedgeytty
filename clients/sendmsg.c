@@ -9,8 +9,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 #include "version.h"
 
 char *argv0;
@@ -21,7 +21,7 @@ void Usage(void) {
           "Currently known options:\n"
           " -h, --help              display this help and exit\n"
           " -V, --version           output version information and exit\n"
-          " --twin@<dpy>            set the server to contact (default is $TWDISPLAY)\n"
+          " --twin@<dpy>            set the server to contact (default is $HTDISPLAY)\n"
           " --control               send a msg_user_control message (default)\n"
           " --clientmsg             send a msg_user_clientmsg message\n"
           " [--code=]<Code>         set the message code (default is `open')\n"

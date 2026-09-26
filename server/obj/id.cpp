@@ -17,7 +17,7 @@
 #include "alloc.h" // Error(), ReAllocMem0()
 #include "twin.h"  // NOSLOT
 
-#include <Tw/Tw_defs.h> // TW_BIGBUFF
+#include <Ht/Tw_defs.h> // TW_BIGBUFF
 
 /* functions to manage Ids */
 

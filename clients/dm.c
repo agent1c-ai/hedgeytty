@@ -18,9 +18,9 @@
 #include <pwd.h>
 #include <sys/stat.h>
 
-#include <Tw/Tw.h>
-#include <Tw/Twkeys.h>
-#include <Tw/Twerrno.h>
+#include <Ht/Tw.h>
+#include <Ht/Twkeys.h>
+#include <Ht/Twerrno.h>
 #include <Tutf/Tutf.h>
 
 #include "version.h"
@@ -206,7 +206,7 @@ static byte InitServer(void) {
         i = read(fd[0], buff, 79);
       } while (i < 0 && errno == EINTR);
       close(fd[0]);
-      if (i > 33 && !memcmp(buff, "twin: starting in background as :", 33)) {
+      if (i > 33 && !memcmp(buff, "hedgeytty: starting in background as :", 33)) {
         while (buff[--i] == '\n')
           ;
         buff[++i] = '\0';

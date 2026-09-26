@@ -17,7 +17,7 @@
 #include "obj/window.h" // class Sremotedata
 #include "stl/list.h"
 
-#include <Tw/datatypes.h>
+#include <Ht/datatypes.h>
 
 class Smsgport : public Sobj {
 public:

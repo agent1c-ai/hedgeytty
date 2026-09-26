@@ -20,7 +20,7 @@
 #include "stl_types.h"  /* String */
 #include "stl/list.h"
 
-#include <Tw/Tw.h> /* TW_MAX_MIMELEN */
+#include <Ht/Tw.h> /* TW_MAX_MIMELEN */
 
 class Ssetup {
 public:

@@ -77,7 +77,7 @@
 #include <sys/stat.h>
 #include <sys/socket.h>
 
-#include <Tw/Twkeys.h>
+#include <Ht/Twkeys.h>
 #include <Tutf/Tutf.h>
 
 #include "twin.h"

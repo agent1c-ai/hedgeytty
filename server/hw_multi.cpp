@@ -11,7 +11,7 @@
  *
  */
 
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 
 #include <stdio.h>
 
@@ -42,7 +42,7 @@
 #include "stl/string.h"
 #include "util.h"
 
-#include <Tw/Tw.h>
+#include <Ht/Tw.h>
 
 #define forHW(hw)                                                                                  \
   for (Tdisplay next_hw = hw = All->Displays.First; hw && ((next_hw = hw->Next), true);            \
@@ -120,9 +120,9 @@ void RunNoHW(byte print_info) {
 
         /* if stderr != stdout, also print on stdout (exploited by twdm) */
         if (fstat(1, &s1) != fstat(2, &s2) || s1.st_ino != s2.st_ino)
-          printf("twin: starting in background as %s (pid %d)\n", TWDisplay, (unsigned)child);
+          printf("hedgeytty: starting in background as %s (pid %d)\n", TWDisplay, (unsigned)child);
 
-        fprintf(stderr, "twin: starting in background as %s (pid %d)\n", TWDisplay,
+        fprintf(stderr, "hedgeytty: starting in background as %s (pid %d)\n", TWDisplay,
                 (unsigned)child);
       }
       exit(0);
@@ -158,10 +158,10 @@ static bool module_InitHW(Tdisplay hw, Chars arg) {
     Module = DlLoadAny(name);
 
     if (Module) {
-      log(INFO) << "twin: starting display driver module `" << name << "'...\n";
+      log(INFO) << "hedgeytty: starting display driver module `" << name << "'...\n";
       bool (*InitD)(Tdisplay);
       if ((InitD = Module->DoInit) && InitD(hw)) {
-        log(INFO) << "twin: ...module `" << name << "' successfully started.\n";
+        log(INFO) << "hedgeytty: ...module `" << name << "' successfully started.\n";
         hw->Module = Module;
         Module->Used++;
         return true;
@@ -171,9 +171,9 @@ static bool module_InitHW(Tdisplay hw, Chars arg) {
   }
 
   if (Module) {
-    log(ERROR) << "twin: ...module `" << name << "' failed to start.\n";
+    log(ERROR) << "hedgeytty: ...module `" << name << "' failed to start.\n";
   } else {
-    log(ERROR) << "twin: unable to load display driver module `" << name //
+    log(ERROR) << "hedgeytty: unable to load display driver module `" << name //
                << "' :\n      " << Errstr << "\n";
   }
   return false;
@@ -188,7 +188,7 @@ static byte set_hw_name(Tdisplay hw, const Chars name) {
 }
 
 static void warn_NoHW(const char *arg, uldat len) {
-  log(ERROR) << "twin: all display drivers failed";
+  log(ERROR) << "hedgeytty: all display drivers failed";
   if (arg)
     log(ERROR) << " for `" << Chars(arg, len) << "'\n";
   else
@@ -279,7 +279,7 @@ static bool IsValidNameHW(Chars carg) {
       /* the rest are options - validated by each hw HW */
       break;
     if ((b < '0' || b > '9') && (b < 'A' || b > 'Z') && (b < 'a' || b > 'z') && b != '_') {
-      log(ERROR) << "twin: invalid non-alphanumeric character 0x" << hex(b)
+      log(ERROR) << "hedgeytty: invalid non-alphanumeric character 0x" << hex(b)
                  << " in display HW name `" << Chars(arg, len) << "'\n";
       return false;
     }
@@ -291,14 +291,14 @@ Tdisplay AttachDisplayHW(Chars arg, uldat slot, byte flags) {
   Tdisplay hw = NULL;
 
   if (arg && !arg.starts_with(Chars("-hw="))) {
-    log(ERROR) << "twin: specified `" << arg
+    log(ERROR) << "hedgeytty: specified `" << arg
                << "' is not a known option.\n"
                   "      try `twin --help' for usage summary.\n";
     return hw;
   }
 
   if (All->ExclusiveDisplay) {
-    log(ERROR) << "twin: exclusive display in use, permission to display denied!\n";
+    log(ERROR) << "hedgeytty: exclusive display in use, permission to display denied!\n";
     return hw;
   }
 
@@ -382,20 +382,20 @@ byte InitHW(void) {
     } else if (arg.starts_with(Chars("-plugindir="))) {
       ; // already processed, ignore option
     } else {
-      log(WARNING) << "twin: ignoring unknown option `" << arg << "'\n";
+      log(WARNING) << "hedgeytty: ignoring unknown option `" << arg << "'\n";
     }
   }
 
   if (nohw && hwcount > 0) {
-    log(ERROR) << "twin: `--hw=' and `--nohw' options cannot be used together.\n";
+    log(ERROR) << "hedgeytty: `--hw=' and `--nohw' options cannot be used together.\n";
     return ret;
   }
   if (flags & TW_ATTACH_HW_EXCLUSIVE) {
     if (nohw) {
-      log(ERROR) << "twin: `--excl' cannot be used with `--nohw'.\n";
+      log(ERROR) << "hedgeytty: `--excl' cannot be used with `--nohw'.\n";
       return ret;
     } else if (hwcount > 1) {
-      log(ERROR) << "twin: `--excl' cannot be used with multiple `--hw'.\n";
+      log(ERROR) << "hedgeytty: `--excl' cannot be used with multiple `--hw'.\n";
       return ret;
     }
   }
@@ -451,7 +451,7 @@ bool RestartHW(bool verbose) {
       RunNoHW(tfalse);
     }
   } else if (verbose) {
-    log(INFO) << "twin: RestartHW(): All display drivers removed by SuspendHW().\n"
+    log(INFO) << "hedgeytty: RestartHW(): All display drivers removed by SuspendHW().\n"
                  "      No display available for restarting, use twattach or twdisplay.\n";
   }
   return ret;
@@ -467,9 +467,9 @@ void SuspendHW(bool verbose) {
       hw->DoQuit();
   }
   if (verbose && !All->Displays.First) {
-    log(INFO) << "twin: SuspendHW(): All display drivers had to be removed\n"
+    log(INFO) << "hedgeytty: SuspendHW(): All display drivers had to be removed\n"
                  "      since they were attached to clients (twattach/twdisplay).\n"
-                 "twin: --- STOPPED ---\n";
+                 "hedgeytty: --- STOPPED ---\n";
   }
 }
 
@@ -554,7 +554,7 @@ byte ResizeDisplay(void) {
   } else if ((NeedOldVideo && !OldVideo) || change) {
     if (!(OldVideo = (tcell *)ReAllocMem(OldVideo, (ldat)TryDisplayWidth * TryDisplayHeight *
                                                        sizeof(tcell)))) {
-      log(ERROR) << "twin: out of memory!\n";
+      log(ERROR) << "hedgeytty: out of memory!\n";
       Quit(1);
     }
     ValidOldVideo = tfalse;
@@ -570,7 +570,7 @@ byte ResizeDisplay(void) {
         !(saveChangedVideo =
               (dat(*)[2][2])ReAllocMem(saveChangedVideo, (ldat)DisplayHeight * sizeof(dat) * 4))) {
 
-      log(ERROR) << "twin: out of memory!\n";
+      log(ERROR) << "hedgeytty: out of memory!\n";
       Quit(1);
     }
     memset(ChangedVideo, 0xff, (ldat)DisplayHeight * sizeof(dat) * 4);
@@ -668,7 +668,7 @@ void TwinSelectionSetOwner(Tobj Owner, tany Time, tany Frac) {
 
 void TwinSelectionNotify(Tobj requestor, uldat reqprivate, e_id magic, Chars mime, Chars data) {
 #if 0
-  log(INFO) << "twin: Selection Notify to 0x" << hex(requestor ? requestor->Id : NOID) << "\n";
+  log(INFO) << "hedgeytty: Selection Notify to 0x" << hex(requestor ? requestor->Id : NOID) << "\n";
 #endif
   if (!requestor) {
     (void)SelectionStore(magic, mime, data);
@@ -700,7 +700,7 @@ void TwinSelectionNotify(Tobj requestor, uldat reqprivate, e_id magic, Chars mim
 
 void TwinSelectionRequest(Tobj requestor, uldat reqprivate, Tobj owner) {
 #if 0
-  log(INFO) << "twin: Selection Request from 0x" << (requestor ? requestor->Id : NOID)
+  log(INFO) << "hedgeytty: Selection Request from 0x" << (requestor ? requestor->Id : NOID)
             << ", owner is 0x" << (owner ? owner->Id : NOID) << "\n";
 #endif
   if (owner) {

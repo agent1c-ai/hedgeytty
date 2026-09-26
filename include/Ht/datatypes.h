@@ -2,7 +2,7 @@
 #define TW_DATATYPES_H
 
 #ifndef TWTWAUTOCONF_H
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #endif
 
 #if defined(TW_HAVE_STDDEF_H)
@@ -17,7 +17,7 @@
 #include <string.h> /* for memcpy() */
 #endif
 
-#include <Tw/compiler.h> // for TW_INLINE
+#include <Ht/compiler.h> // for TW_INLINE
 
 #ifdef __cplusplus
 extern "C" {

@@ -24,11 +24,11 @@
 #include "log.h"
 #include "stl/view.h"
 
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
-#include <Tw/Twkeys.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
+#include <Ht/Twkeys.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 
 struct sel_req {
   tany Requestor;
@@ -476,13 +476,13 @@ TW_ATTR_HIDDEN bool tw_driver::InitHW(Tdisplay hw) {
     if (arg.contains(Chars(",help"))) {
       log(INFO)
           << "   --hw=twin options:\n"
-             "      @TWDPY      connect to TWDPY instead of $TWDISPLAY (must be first option)\n"
+             "      @TWDPY      connect to TWDPY instead of $HTDISPLAY (must be first option)\n"
              "      ,help       show this help\n"
              "      ,noinput    open a view-only window - ignore input\n"
              "      ,slow       assume connection is slow\n";
       return false;
     }
-    /* if '@' is present, it is followed by the TWDISPLAY to use */
+    /* if '@' is present, it is followed by the HTDISPLAY to use */
     const size_t at = arg.find(Chars("@"));
     if (at != size_t(-1)) {
       arg = arg.view(at + 1, arg.size());
@@ -499,11 +499,11 @@ TW_ATTR_HIDDEN bool tw_driver::InitHW(Tdisplay hw) {
 
   if (!arg && !(arg = Chars::from_c(origTWDisplay))) {
     /*
-     * we can't call Tw_Open(NULL) since getenv("TWDISPLAY")
+     * we can't call Tw_Open(NULL) since getenv("HTDISPLAY")
      * returns OUR socket... and using ourself as display isn't
      * exactly a bright idea.
      */
-    log(ERROR) << "      TW_InitHW() failed: TWDISPLAY is not set\n";
+    log(ERROR) << "      TW_InitHW() failed: HTDISPLAY is not set\n";
     return false;
   }
   tw_driver *self;

@@ -30,7 +30,7 @@
 #include "hw_multi.h"
 #include "common.h"
 
-#include <Tw/Twkeys.h> /* for TW_* key defines */
+#include <Ht/Twkeys.h> /* for TW_* key defines */
 #include <Tutf/Tutf.h> /* for UCS-2 to charset conversions */
 
 #include "rctypes.h"
@@ -684,7 +684,7 @@ static void DetailCtx(wm_ctx *C) {
     /* ensure IS_SCREEN(C->W->Parent) is true. */
     Twidget parent = C->W->Parent;
     if (!parent || !IS_SCREEN(parent)) {
-      log(ERROR) << "twin: wm.c: DetailCtx(): internal error: C->W is a subwidget!\n";
+      log(ERROR) << "hedgeytty: wm.c: DetailCtx(): internal error: C->W is a subwidget!\n";
       return;
     }
     C->Screen = (Tscreen)parent;
@@ -1961,13 +1961,13 @@ bool InitWM(void) {
         if (InitRC()) {
           return true;
         } else {
-          log(ERROR) << "twin: RC: " << Errstr << "\n";
+          log(ERROR) << "hedgeytty: RC: " << Errstr << "\n";
           logged = true;
         }
       }
       UnRegisterExt(WM, MsgPort, WM_MsgPort);
     } else {
-      log(ERROR) << "twin: WM: RegisterExt(WM,MsgPort) failed! Another WM is running?\n";
+      log(ERROR) << "hedgeytty: WM: RegisterExt(WM,MsgPort) failed! Another WM is running?\n";
       logged = true;
     }
   }
@@ -1975,7 +1975,7 @@ bool InitWM(void) {
     WM_MsgPort->Delete();
   }
   if (!logged) {
-    log(ERROR) << "twin: WM: " << Errstr << "\n";
+    log(ERROR) << "hedgeytty: WM: " << Errstr << "\n";
   }
   return false;
 }

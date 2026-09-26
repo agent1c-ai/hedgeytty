@@ -1,15 +1,11 @@
 # HedgeyTTY
 
-**HedgeyTTY is a fork of [Twin](https://github.com/cosmos72/twin)** — the
-Textmode WINdow environment by Massimiliano Ghilardi — packaged with the
-defaults we use for a mouse-friendly Linux console desktop, including the
-Hitomi hedgehog wallpaper.
+**HedgeyTTY is a fork of [Twin](https://github.com/cosmos72/twin)** (Textmode
+WINdow environment by Massimiliano Ghilardi), packaged as its own runtime —
+not a shell wrapper around Ubuntu’s `twin` package.
 
-Upstream Twin: https://github.com/cosmos72/twin  
+Upstream Twin baseline in this tree: **v1.0.0** (see [`README.twin.md`](README.twin.md)).  
 This fork: https://github.com/agent1c-ai/hedgeytty
-
-Twin’s own documentation lives in [`README.twin.md`](README.twin.md) (the
-original upstream README).
 
 ## Quick install
 
@@ -18,8 +14,8 @@ curl -fsSL https://agent1c.ai/tty.sh | sh
 ```
 
 `https://agent1c.ai/tty.sh` is a **thin redirect** into this repository’s
-[`install.sh`](install.sh). Edit install behaviour here — not on the website —
-so the curl entrypoint never drifts.
+[`install.sh`](install.sh). The installer builds from source into
+`~/.local` (build deps only — **not** the `twin` binary).
 
 Equivalent:
 
@@ -33,43 +29,58 @@ Then on a text console:
 hedgeytty
 ```
 
-First boot shows a **windowless** desktop (top menu bar + hedgehog wallpaper).
-Open a terminal with **Alt-Up** when you want one.
+First boot is **windowless** (menubar + Hitomi hedgehog). **Alt-Up** opens a terminal.
+
+## Naming (coexistence with apt Twin)
+
+Stock Twin and HedgeyTTY can both be installed. They use different sockets and
+env vars, so they do not fight for `:0`.
+
+| Twin (apt / upstream) | HedgeyTTY |
+|---|---|
+| `twin` / `twin_server` | `hedgeytty` / `hedgeytty_server` |
+| `twterm`, `twattach`, … | `htterm`, `htattach`, … |
+| `TWDISPLAY`, `/tmp/.Twin:N` | `HTDISPLAY`, `/tmp/.HedgeyTTY:N` |
+| `~/.TwinAuth` | `~/.HedgeyTTYAuth` |
+| `~/.config/twin/twinrc` | `~/.config/hedgeytty/hedgeyttyrc` |
+| `libtw.so` | `libht.so` (headers under `Ht/`) |
+
+Wire protocol stays Twin-compatible in spirit; on-disk and env names differ.
 
 ## What this fork adds
 
 | Piece | Why |
 |---|---|
-| **gpm console mouse** (`exps2` on `/dev/input/mice`) | Twin’s tty driver needs gpm for a usable mouse on the Linux VT. Documented in [`hedgeytty/docs/mouse.md`](hedgeytty/docs/mouse.md); installer runs `hedgeytty-setup-gpm`. |
-| **Socket + term modules on by default** | External clients (`twterm`, agents, etc.) can open windows without hunting the Modules menu. |
-| **Hitomi hedgehog desktop** | `hedgeytty-hitomi-bg` paints truecolor UTF-8 half-blocks through libtw (Twin 1.0’s twinrc/ANSI colors truncate Magenta→Blue and break `twsetroot` ANSI). |
-| **TurboVision-style menus** | Always-visible menubar, left-click to open (from upstream sample, kept as default). |
-| **`hedgeytty` launcher** | Run `hedgeytty` from the CLI (wraps `twin` with PATH + mouse hints). |
-| **Windowless first boot** | No auto terminal — first paint is menubar + hedgehog desktop. Alt-Up opens a term. |
-
-We intentionally keep Twin’s server/protocol intact. HedgeyTTY is Twin plus
-opinionated packaging, config, and desktop chrome.
+| **Namespaced runtime** | Own binaries, sockets, auth, config, and `libht` so apt `twin` can stay installed. |
+| **gpm console mouse** | Documented in [`hedgeytty/docs/mouse.md`](hedgeytty/docs/mouse.md); installer runs `hedgeytty-setup-gpm`. |
+| **Socket + term modules on** | Clients (`htterm`, agents) can open windows without hunting the Modules menu. |
+| **Hitomi hedgehog desktop** | `hedgeytty-hitomi-bg` paints truecolor UTF-8 half-blocks via `libht` (Twin 1.0 twinrc/ANSI colors truncate Magenta→Blue). |
+| **TurboVision-style menus** | Always-visible menubar, left-click to open. |
+| **Windowless first boot** | No auto `ExecTty` — menubar + hedgehog only. |
 
 ## Layout
 
 ```
-install.sh                 # curl|sh canonical installer
+install.sh                 # curl|sh from-source installer → ~/.local
+hedgeyttyrc                # package default RC (sysconfdir + user copy)
+htenvrc.sh
+assets/hitomi-icon.png
+clients/hitomi-bg.c        # hedgeytty-hitomi-bg
 hedgeytty/
-  bin/hedgeytty            # launcher
-  bin/hedgeytty-hitomi-bg.c
-  config/twinrc            # installed to ~/.config/twin/twinrc
-  config/twenvrc.sh
-  assets/hitomi-icon.png
   scripts/setup-gpm.sh
   docs/mouse.md
-…                          # full Twin v1.0.0 source tree (upstream)
+…                          # Twin v1.0.0-derived source (forked)
 ```
 
 ## Requirements
 
-- Linux with a virtual console (tested on Ubuntu)
-- Packages the installer pulls on Debian/Ubuntu: `twin`, `gpm`, `imagemagick`,
-  build tools, `libgpm-dev` (and Twin’s headers via the `twin` package)
+- Linux virtual console (tested on Ubuntu)
+- Build packages (installer pulls on Debian/Ubuntu): `build-essential`,
+  `autoconf`, `automake`, `libtool`, `pkg-config`, `gpm`, `libgpm-dev`,
+  `imagemagick`, `libx11-dev`, `libxft-dev`, `zlib1g-dev`, `libncurses-dev`,
+  `libltdl-dev` — **not** the `twin` WM binary
+
+Build time is a few minutes on a CPU laptop; prefix defaults to `~/.local`.
 
 ## Developer install (local tree)
 
@@ -77,10 +88,19 @@ hedgeytty/
 HEDGEYTTY_LOCAL=/path/to/hedgeytty ./install.sh
 ```
 
+Or manually:
+
+```bash
+./configure --prefix="$HOME/.local" --enable-socket --enable-term --disable-ttlib
+make -j2 && make install
+```
+
+On memory-tight hosts, prefer `lab-run -- make -j2` when available.
+
 ## License
 
 Twin is GPL-2.0-or-later; see [`COPYING`](COPYING) / [`COPYING.LIB`](COPYING.LIB).
-HedgeyTTY packaging scripts and assets in `hedgeytty/` are offered under the
-same terms unless otherwise noted. The Hitomi icon is fetched/bundled from
+HedgeyTTY packaging scripts and assets are offered under the same terms unless
+otherwise noted. The Hitomi icon is fetched/bundled from
 [hitomi.love](https://hitomi.love) for desktop branding — respect upstream
 branding rights if you redistribute.

@@ -5,12 +5,14 @@
  * per-cell truecolor half-blocks through libtw.
  */
 #include <errno.h>
+#include <sys/stat.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Tw/Tw.h>
-#include <Tw/Twerrno.h>
+#include <unistd.h>
+#include <Ht/Tw.h>
+#include <Ht/Twerrno.h>
 
 TW_DECL_MAGIC(hedgeytty_hitomi_magic);
 
@@ -21,11 +23,39 @@ TW_DECL_MAGIC(hedgeytty_hitomi_magic);
 /* Desktop field */
 static const trgb DESK_R = 180, DESK_G = 60, DESK_B = 140; /* magenta-ish */
 
+/* Bridge apt Twin sockets/auth into HedgeyTTY names so libht can attach
+ * while both stacks coexist (same wire protocol, different on-disk names). */
+static void bridge_apt_twin(void) {
+  const char *home = getenv("HOME");
+  char twin_sock[64], ht_sock[64], twin_auth[512], ht_auth[512];
+  struct stat st;
+  int n;
+
+  for (n = 0; n < 8; n++) {
+    snprintf(twin_sock, sizeof twin_sock, "/tmp/.Twin:%d", n);
+    snprintf(ht_sock, sizeof ht_sock, "/tmp/.HedgeyTTY:%d", n);
+    if (stat(twin_sock, &st) == 0 && S_ISSOCK(st.st_mode)) {
+      if (stat(ht_sock, &st) != 0)
+        symlink(twin_sock, ht_sock);
+    }
+  }
+  if (!home || !*home)
+    return;
+  snprintf(twin_auth, sizeof twin_auth, "%s/.TwinAuth", home);
+  snprintf(ht_auth, sizeof ht_auth, "%s/.HedgeyTTYAuth", home);
+  if (stat(twin_auth, &st) == 0 && S_ISREG(st.st_mode) && stat(ht_auth, &st) != 0)
+    symlink(twin_auth, ht_auth);
+}
+
 static byte open_twin(void) {
   const char *dpy;
   char buf[64];
   FILE *fp;
 
+  bridge_apt_twin();
+
+  if ((dpy = getenv("HTDISPLAY")) && TwOpen(dpy))
+    return ttrue;
   if ((dpy = getenv("TWDISPLAY")) && TwOpen(dpy))
     return ttrue;
   if (TwOpen(NULL))
@@ -34,7 +64,7 @@ static byte open_twin(void) {
     return ttrue;
   if (TwOpen(":1"))
     return ttrue;
-  fp = popen("twfindtwin 2>/dev/null", "r");
+  fp = popen("htfindtwin 2>/dev/null; twfindtwin 2>/dev/null", "r");
   if (fp) {
     if (fgets(buf, sizeof buf, fp)) {
       size_t n = strlen(buf);
@@ -101,19 +131,34 @@ static byte *load_rgba(const char *png, int target_cols, int target_cell_rows, i
   return buf;
 }
 
+static int file_ok(const char *p) {
+  struct stat st;
+  return p && p[0] && stat(p, &st) == 0 && S_ISREG(st.st_mode) && st.st_size > 0;
+}
+
 static const char *ensure_icon(char *path, size_t pathlen) {
-  const char *share = getenv("XDG_DATA_HOME");
+  const char *home = getenv("HOME") ? getenv("HOME") : ".";
+  const char *xdg = getenv("XDG_DATA_HOME");
   char dir[512];
-  char urlcmd[768];
+  char urlcmd[1024];
 
-  if (share && *share)
-    snprintf(dir, sizeof dir, "%s/hedgeytty", share);
+#ifndef DATADIR
+#define DATADIR "/usr/local/share/hedgeytty"
+#endif
+
+  /* Prefer installed / user icon; fall back to download. */
+  snprintf(path, pathlen, "%s/hitomi-icon.png", DATADIR);
+  if (file_ok(path))
+    return path;
+  if (xdg && *xdg)
+    snprintf(dir, sizeof dir, "%s/hedgeytty", xdg);
   else
-    snprintf(dir, sizeof dir, "%s/.local/share/hedgeytty", getenv("HOME") ? getenv("HOME") : ".");
-
+    snprintf(dir, sizeof dir, "%s/.local/share/hedgeytty", home);
   snprintf(path, pathlen, "%s/hitomi-icon.png", dir);
-  snprintf(urlcmd, sizeof urlcmd, "mkdir -p '%s' && test -s '%s' || curl -fsSL -o '%s' '%s'", dir,
-           path, path, ICON_URL);
+  if (file_ok(path))
+    return path;
+  snprintf(urlcmd, sizeof urlcmd,
+           "mkdir -p '%s' && curl -fsSL -o '%s' '%s'", dir, path, ICON_URL);
   if (system(urlcmd) != 0) {
     fprintf(stderr, "hedgeytty-hitomi-bg: failed to fetch icon\n");
     return NULL;

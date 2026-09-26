@@ -14,8 +14,8 @@
  *
  */
 
-#include <Tw/Tw.h>
-#include <Tw/Twavl.h>
+#include <Ht/Tw.h>
+#include <Ht/Twavl.h>
 
 /*
  * Searching a node in a linear list is horribly slow.

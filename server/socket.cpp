@@ -17,7 +17,7 @@
  * "twconfig.h" and "osincludes.h" early to pull in TW_HAVE_* and system headers
  * necessary to include <sys/socket.h> under FreeBSD.
  */
-#include <Tw/autoconf.h>
+#include <Ht/autoconf.h>
 #include "osincludes.h"
 
 #include <sys/socket.h>
@@ -66,10 +66,10 @@
 
 #include "stl/span.h"
 
-#include <Tw/Tw.h>
-#include <Tw/Twkeys.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twkeys.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 #include <Tutf/Tutf.h>
 
 class SockCtx;
@@ -739,7 +739,7 @@ static void sockMultiplexB(SockCtx &ctx, uldat id) {
     } else /* (n >= TW_MAX_ARGS_N) */ {
       if (!warned) {
         warned = ttrue;
-        log(ERROR) << "twin: sockMultiplexB(): got a call with " << n << " args, only "
+        log(ERROR) << "hedgeytty: sockMultiplexB(): got a call with " << n << " args, only "
                    << TW_MAX_ARGS_N << " supported!\n";
       }
       fail = -fail;
@@ -929,7 +929,7 @@ static void sockAttachHW(SockCtx &ctx, uldat len, const char *arg, byte flags) {
 
   if (!xLS.MsgPort) {
     if (verbose) {
-      write(realFd, "twin: AttachHW(): client did not create a MsgPort\n\0", 52);
+      write(realFd, "hedgeytty: AttachHW(): client did not create a MsgPort\n\0", 52);
     } else {
       write(realFd, buf, 2);
     }
@@ -1900,7 +1900,7 @@ static byte SendUldat(uldat slot, uldat data) {
 }
 
 #define digestLen 16 /* hardcoded in MD5 routines */
-#define AuthLen 256  /* length of ~/.TwinAuth */
+#define AuthLen 256  /* length of ~/.HedgeyTTYAuth */
 #define ChallLen 256 /* length of random data */
 #define TotalLen (AuthLen + ChallLen)
 
@@ -1976,7 +1976,7 @@ static bool SocketInitAuth(void) {
   len = HOME.size();
   len = Min2(len, TotalLen - 11);
   CopyMem(HOME.data(), AuthData, len);
-  CopyMem("/.TwinAuth", AuthData + len, 11);
+  CopyMem("/.HedgeyTTYAuth", AuthData + len, 16);
 
   if ((fd = open(AuthData, O_RDONLY)) < 0)
     return CreateAuth(AuthData);
@@ -2159,10 +2159,10 @@ static byte Check4MagicTranslation(uldat slot, const byte *magic, byte len) {
       }
       if (zero) {
         if (warn_count == 5) {
-          log(WARNING) << "twin: warning: many clients with different sizes, suppressing further "
+          log(WARNING) << "hedgeytty: warning: many clients with different sizes, suppressing further "
                           "messages.\n";
         } else {
-          log(WARNING) << "twin: warning: client has different `" << Chars::from_c(zero)
+          log(WARNING) << "hedgeytty: warning: client has different `" << Chars::from_c(zero)
                        << "' size, it may not be Unicode aware.\n";
         }
         warn_count++;
@@ -2456,7 +2456,7 @@ EXTERN_C byte InitModule(Tmodule Module) {
   };
 
   if (!SocketInitAuth()) {
-    log(ERROR) << "twin: failed to create ~/.TwinAuth: " << Errstr << "\n";
+    log(ERROR) << "hedgeytty: failed to create ~/.HedgeyTTYAuth: " << Errstr << "\n";
     return tfalse;
   }
 
@@ -2506,7 +2506,7 @@ EXTERN_C byte InitModule(Tmodule Module) {
 
     return ttrue;
   }
-  log(ERROR) << "twin: failed to create sockets: " << Errstr << "\n";
+  log(ERROR) << "hedgeytty: failed to create sockets: " << Errstr << "\n";
   return tfalse;
 }
 

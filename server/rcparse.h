@@ -172,7 +172,7 @@ ldat GlobalFlags[4];
 ldat GlobalShadows[2];
 
 static void yyerror(const char *s) {
-  log(ERROR) << "twin: " << Chars::from_c(FILE_NAME) << ":" << LINE_NO << ": " << Chars::from_c(s)
+  log(ERROR) << "hedgeytty: " << Chars::from_c(FILE_NAME) << ":" << LINE_NO << ": " << Chars::from_c(s)
              << "\n";
 }
 
@@ -1249,7 +1249,7 @@ static void DeleteUnneededScreens(node list) {
 }
 
 static void NewCommonMenu_Overflow(void) {
-  log(ERROR) << "twin: RC parser: user-defined menu is too big! (max is "
+  log(ERROR) << "hedgeytty: RC parser: user-defined menu is too big! (max is "
              << (int)(TW_MAXUDAT - COD_RESERVED + 1) << " entries)\n";
 }
 
@@ -1432,7 +1432,7 @@ static bool rcload(Tdisplay hw) {
 #endif
   bool c = false;
 
-  if (!(path = FindConfigFile("twinrc", &len)))
+  if (!(path = FindConfigFile("hedgeyttyrc", &len)))
     return c;
 
   /*

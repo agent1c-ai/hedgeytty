@@ -32,9 +32,9 @@
 #include "wm.h"
 
 #include <new>
-#include <Tw/Tw.h>
-#include <Tw/Twstat.h>
-#include <Tw/Twstat_defs.h>
+#include <Ht/Tw.h>
+#include <Ht/Twstat.h>
+#include <Ht/Twstat_defs.h>
 #include <Tutf/Tutf.h>
 #include <Tutf/Tutf_defs.h>
 

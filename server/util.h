@@ -10,7 +10,7 @@
 #define TWIN_UTIL_H
 
 #ifndef TW_TWAUTOCONF_H
-#include <Tw/autoconf.h> /* for TW_HAVE_ALARM */
+#include <Ht/autoconf.h> /* for TW_HAVE_ALARM */
 #endif
 
 #ifdef TW_HAVE_SYS_TIMEB_H
