@@ -224,7 +224,46 @@ static void reclaim_server(const char *path, pid_t peer) {
     if (kill(peer, 0) == 0)
       (void)kill(peer, SIGKILL);
   }
-  unlink(path);
+  if (path)
+    unlink(path);
+}
+
+/* Kill every hedgeytty_server with no controlling tty (crash / --nohw leftovers). */
+static void reap_orphan_hedgeytty_servers(void) {
+  DIR *proc;
+  struct dirent *pe;
+
+  proc = opendir("/proc");
+  if (!proc)
+    return;
+  while ((pe = readdir(proc)) != NULL) {
+    char cpath[64], comm[64];
+    int cfd, cn;
+    pid_t pid;
+
+    if (!isdigit((unsigned char)pe->d_name[0]))
+      continue;
+    pid = (pid_t)atoi(pe->d_name);
+    if (pid <= 1)
+      continue;
+    snprintf(cpath, sizeof cpath, "/proc/%s/comm", pe->d_name);
+    cfd = open(cpath, O_RDONLY);
+    if (cfd < 0)
+      continue;
+    cn = (int)read(cfd, comm, sizeof comm - 1);
+    close(cfd);
+    if (cn <= 0)
+      continue;
+    comm[cn] = '\0';
+    if (comm[cn - 1] == '\n')
+      comm[cn - 1] = '\0';
+    /* Linux truncates comm to 15 chars: "hedgeytty_serve" */
+    if (!strstr(comm, "hedgeytty"))
+      continue;
+    if (proc_tty_nr(pid) <= 0)
+      reclaim_server(NULL, pid);
+  }
+  closedir(proc);
 }
 
 /*
@@ -239,57 +278,65 @@ static int probe_server_sock(const char *path) {
   int fd, connected;
   pid_t peer;
   int our_tty, peer_tty;
+  int have_node;
 
-  if (lstat(path, &st) != 0)
-    return 0;
-  if (S_ISLNK(st.st_mode)) {
-    if (stat(path, &st) != 0 || !S_ISSOCK(st.st_mode)) {
-      unlink(path);
+  have_node = (lstat(path, &st) == 0);
+  if (have_node) {
+    if (S_ISLNK(st.st_mode)) {
+      if (stat(path, &st) != 0 || !S_ISSOCK(st.st_mode)) {
+        unlink(path);
+        have_node = 0;
+      }
+    } else if (!S_ISSOCK(st.st_mode)) {
       return 0;
     }
-  } else if (!S_ISSOCK(st.st_mode)) {
-    return 0;
   }
 
-  fd = socket(AF_UNIX, SOCK_STREAM, 0);
-  if (fd < 0)
-    return 1; /* assume busy */
-
-  memset(&addr, 0, sizeof addr);
-  addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, path, sizeof addr.sun_path - 1);
-  connected = connect(fd, (struct sockaddr *)&addr, sizeof addr) == 0;
-  close(fd);
-
-  if (!connected) {
-    unlink(path); /* stale after crash / nested Quit */
-    return 0;
-  }
-
-  /* Do NOT use SO_PEERCRED — Twin accept helpers die before /proc is readable. */
+  /* Listener may still exist after a half-unlink; always resolve via /proc. */
   peer = sock_listener_pid(path);
   our_tty = proc_tty_nr(getpid());
   peer_tty = proc_tty_nr(peer);
 
-  /* Orphan / unreadable CTTY: crash, --nohw leftover, or dead accept race. */
   if (peer > 1 && peer_tty <= 0) {
     reclaim_server(path, peer);
     return -1;
   }
-
-  /*
-   * Only refuse when the live server owns *our* console. A session on
-   * another tty (or when we have no CTTY) must not brick startup forever.
-   */
-  if (our_tty > 0 && peer_tty == our_tty)
+  if (our_tty > 0 && peer > 1 && peer_tty == our_tty)
     return 1;
 
-  /* Live socket but cannot identify a listener — reclaim path to unblock. */
+  connected = 0;
+  if (have_node) {
+    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (fd < 0)
+      return 1;
+    memset(&addr, 0, sizeof addr);
+    addr.sun_family = AF_UNIX;
+    strncpy(addr.sun_path, path, sizeof addr.sun_path - 1);
+    connected = connect(fd, (struct sockaddr *)&addr, sizeof addr) == 0;
+    close(fd);
+  }
+
+  if (!connected) {
+    /* Path gone or dead name — drop the node; orphans already reaped above. */
+    if (have_node)
+      unlink(path);
+    /* Listener on other tty without connectable path: leave it alone. */
+    return 0;
+  }
+
+  /* Connected: refresh listener identity (path inode may have changed). */
+  peer = sock_listener_pid(path);
+  peer_tty = proc_tty_nr(peer);
+  if (peer > 1 && peer_tty <= 0) {
+    reclaim_server(path, peer);
+    return -1;
+  }
+  if (our_tty > 0 && peer > 1 && peer_tty == our_tty)
+    return 1;
   if (peer <= 1) {
     reclaim_server(path, (pid_t)-1);
     return -1;
   }
-
   return -1;
 }
 
@@ -304,6 +351,9 @@ static int refuse_nested_console(void) {
 
   if (env_truthy("HEDGEYTTY_ALLOW_NESTED"))
     return 0;
+
+  /* Belt-and-suspenders: never leave headless servers bricking :0. */
+  reap_orphan_hedgeytty_servers();
 
   for (i = 0; i < 8; i++) {
     snprintf(path, sizeof path, "/tmp/.Twin:%d", i);
