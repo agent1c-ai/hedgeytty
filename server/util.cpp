@@ -1145,12 +1145,14 @@ static bool initTmpDir(void) {
 }
 
 /**
- * initialize SOCKET_DIR to the directory where to create unix domain socket to listen on:
- * if getenv("XDG_STATE_HOME") is not null, use it + "/twin"
+ * initialize SOCKET_DIR (reserved / unused for listen path today):
+ * if getenv("XDG_STATE_HOME") is not null, use it + "/hedgeytty"
  * otherwise use HOME + "/.local/state/hedgeytty"
  * on out-of-memory, return false
+ *
+ * Actual listen sockets are $TMPDIR/.HedgeyTTY:N (see InitTWDisplay).
  */
-/** return getenv("XDG_STATE_HOME") + "/twin", getenv("HOME") + "/.local/state/hedgeytty"  */
+/** return getenv("XDG_STATE_HOME") + "/hedgeytty", getenv("HOME") + "/.local/state/hedgeytty"  */
 static bool initSocketDir(void) {
   const char *env = getenv("XDG_STATE_HOME");
   if (env != NULL && SocketDir.format(Chars::from_c(env), Chars("/hedgeytty"))) {
@@ -1184,8 +1186,7 @@ static const char *fullTWD = addr_unix.sun_path;
 static char twd[12];
 
 /*
- * create unix domain socket $HOME/.local/state/hedgeytty/socket:HHH
- * create symbolic link /tmp/.Twin:HHH pointing to the former
+ * create unix domain socket $TMPDIR/.HedgeyTTY:HHH and listen on it;
  * set HTDISPLAY to :HHH
  */
 bool InitTWDisplay(void) {
@@ -1211,7 +1212,7 @@ bool InitTWDisplay(void) {
       ok = bind(unixFd, (struct sockaddr *)&addr_unix, sizeof(addr_unix)) >= 0;
       if (!ok) {
         Error(SYSERROR);
-        /* maybe /tmp/.Twin:<x> is already in use... */
+        /* maybe $TMPDIR/.HedgeyTTY:<x> is already in use... */
         if (fd >= 0 || (fd = socket(AF_UNIX, SOCK_STREAM, 0)) >= 0) {
           if (connect(fd, (struct sockaddr *)&addr_unix, sizeof(addr_unix)) >= 0) {
             /*
@@ -1230,9 +1231,9 @@ bool InitTWDisplay(void) {
              * the permission to connect to it (hope).
              * So it must have been be a stale socket.
              *
-             * Trying to delete a /tmp/.Twin:<x> entry we cannot
-             * connect to wreaks havoc if you mix this twin server
-             * with older ones, but having two different server versions
+             * Trying to delete a $TMPDIR/.HedgeyTTY:<x> entry we cannot
+             * connect to wreaks havoc if you mix this server
+             * with older Twin ones, but having two different server versions
              * installed on one system should be rare enough.
              */
             ok = bind(unixFd, (struct sockaddr *)&addr_unix, sizeof(addr_unix)) >= 0;

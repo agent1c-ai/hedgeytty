@@ -8,6 +8,12 @@ if [[ "$(id -u)" -ne 0 ]]; then
   exit 1
 fi
 
+if ! command -v systemctl >/dev/null 2>&1; then
+  echo "hedgeytty-setup-gpm: systemctl not found — cannot enable gpm on this host." >&2
+  echo "Install/configure gpm with your init system, or set HEDGEYTTY_SKIP_GPM=1." >&2
+  exit 0
+fi
+
 export DEBIAN_FRONTEND=noninteractive
 if command -v apt-get >/dev/null 2>&1; then
   apt-get install -y gpm

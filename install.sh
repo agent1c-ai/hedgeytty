@@ -34,13 +34,77 @@ die() { printf 'hedgeytty: ERROR: %s\n' "$*" >&2; exit 1; }
 
 need_cmd() { command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"; }
 
+refuse_unsupported_os() {
+  local u
+  u=$(uname -s 2>/dev/null || echo unknown)
+  # Termux sets TERMUX_VERSION; do not confuse with HEDGEYTTY_PREFIX.
+  if [[ -n "${TERMUX_VERSION:-}" ]] || [[ -d /data/data/com.termux/files/usr ]]; then
+    die "Termux is not supported. HedgeyTTY needs a Linux virtual console + gpm (see README)."
+  fi
+  case "$u" in
+    Darwin)
+      die "macOS is not supported. HedgeyTTY targets a Linux text console + gpm (see README)."
+      ;;
+    MINGW*|MSYS*|CYGWIN*|Windows_NT)
+      die "Windows / PowerShell is not supported. HedgeyTTY requires Linux AF_UNIX + VT/gpm."
+      ;;
+    Linux) ;;
+    *)
+      die "unsupported OS '$u'. HedgeyTTY supports Linux text consoles only (see README)."
+      ;;
+  esac
+}
+
+print_manual_deps() {
+  cat >&2 <<'EOF'
+hedgeytty: install these build deps (names vary by distro), then re-run:
+
+  compilers:  gcc g++ make pkg-config autoconf automake libtool
+  libraries:  zlib headers, ncurses headers, libltdl headers
+  mouse:      gpm daemon + gpm.h + libgpm.so  (Linux console)
+  wallpaper:  ImageMagick (magick or convert)
+  network:    curl ca-certificates
+
+  Debian/Ubuntu:  build-essential autoconf automake libtool pkg-config
+                  gpm libgpm-dev imagemagick curl zlib1g-dev libncurses-dev libltdl-dev
+  Fedora:         gcc gcc-c++ make autoconf automake libtool pkgconf
+                  gpm gpm-devel ImageMagick curl zlib-devel ncurses-devel libtool-ltdl-devel
+  Arch:           base-devel gpm imagemagick curl zlib ncurses libtool
+EOF
+}
+
+have_libgpm() {
+  [[ -e /usr/lib/x86_64-linux-gnu/libgpm.so ]] && return 0
+  [[ -e /usr/lib/aarch64-linux-gnu/libgpm.so ]] && return 0
+  [[ -e /usr/lib/libgpm.so ]] && return 0
+  [[ -e /usr/lib64/libgpm.so ]] && return 0
+  ls /usr/lib/*/libgpm.so >/dev/null 2>&1 && return 0
+  return 1
+}
+
+deps_present() {
+  command -v gcc >/dev/null || return 1
+  command -v g++ >/dev/null || return 1
+  command -v make >/dev/null || return 1
+  command -v pkg-config >/dev/null || return 1
+  command -v gpm >/dev/null || return 1
+  command -v magick >/dev/null || command -v convert >/dev/null || return 1
+  command -v curl >/dev/null || return 1
+  [[ -f /usr/include/zlib.h ]] || return 1
+  [[ -f /usr/include/gpm.h ]] || return 1
+  have_libgpm || return 1
+  if [[ "${HEDGEYTTY_WITH_X11:-0}" == 1 ]]; then
+    [[ -f /usr/include/X11/Xlib.h ]] || return 1
+  fi
+  return 0
+}
+
 sudo_cmd() {
   if [[ "$(id -u)" -eq 0 ]]; then
     "$@"
     return
   fi
   command -v sudo >/dev/null 2>&1 || die "need root or sudo for: $*"
-  # Prefer Cursor/askpass when no tty (agents); otherwise normal sudo.
   if [[ ! -t 0 ]] && [[ -z "${SUDO_ASKPASS:-}" ]]; then
     local ap
     ap=$(ls -d "${HOME}/.local/share/cursor-agent/versions/"*/cursor-askpass 2>/dev/null | sort -V | tail -1 || true)
@@ -57,30 +121,17 @@ sudo_cmd() {
 }
 
 install_build_deps() {
-  local missing=0
-  command -v gcc >/dev/null || missing=1
-  command -v g++ >/dev/null || missing=1
-  command -v make >/dev/null || missing=1
-  command -v pkg-config >/dev/null || missing=1
-  command -v gpm >/dev/null || missing=1
-  command -v magick >/dev/null || command -v convert >/dev/null || missing=1
-  command -v curl >/dev/null || missing=1
-  [[ -f /usr/include/zlib.h ]] || missing=1
-  # gpm daemon alone is not enough — without headers/lib, mouse compiles out
-  [[ -f /usr/include/gpm.h ]] || missing=1
-  [[ -e /usr/lib/x86_64-linux-gnu/libgpm.so || -e /usr/lib/libgpm.so ]] || missing=1
-  # X11/Xft are optional (console Twin needs only tty+gpm). Soft-check for nicer builds.
-  local want_x=0
-  if [[ "${HEDGEYTTY_WITH_X11:-0}" == 1 ]]; then
-    want_x=1
-    [[ -f /usr/include/X11/Xlib.h ]] || missing=1
-  fi
-
-  if [[ "$missing" -eq 0 ]]; then
+  if deps_present; then
     log "build dependencies already present"
     return
   fi
-  command -v apt-get >/dev/null || die "apt-get not found; install build deps manually"
+
+  if ! command -v apt-get >/dev/null; then
+    log "apt-get not found and dependencies are incomplete"
+    print_manual_deps
+    die "install build deps manually, then re-run"
+  fi
+
   log "installing build dependencies (not the twin binary)"
   export DEBIAN_FRONTEND=noninteractive
   local pkgs=(
@@ -90,7 +141,7 @@ install_build_deps() {
     zlib1g-dev libncurses-dev
     libltdl-dev
   )
-  if [[ "$want_x" -eq 1 ]]; then
+  if [[ "${HEDGEYTTY_WITH_X11:-0}" == 1 ]]; then
     pkgs+=(libx11-dev libxft-dev)
   fi
   sudo_cmd apt-get update -qq
@@ -117,6 +168,27 @@ fetch_tree() {
   fi
 }
 
+install_user_rc() {
+  local rc_src="$SRC_DIR/hedgeyttyrc"
+  local rc_user="${HOME}/.config/hedgeytty/hedgeyttyrc"
+  local rc_dist="${HOME}/.config/hedgeytty/hedgeyttyrc.dist"
+  local tmp
+
+  mkdir -p "${HOME}/.config/hedgeytty"
+  # Always refresh the packaged default (for diffing); never clobber user rc.
+  tmp=$(mktemp)
+  sed "s|Exec \"hedgeytty-hitomi-bg\"|Exec \"$BIN_DIR/hedgeytty-hitomi-bg\"|" \
+    "$rc_src" >"$tmp"
+  install -m 0644 "$tmp" "$rc_dist"
+  if [[ ! -f "$rc_user" ]]; then
+    install -m 0644 "$tmp" "$rc_user"
+    log "installed $rc_user"
+  else
+    log "keeping existing $rc_user (new default in hedgeyttyrc.dist)"
+  fi
+  rm -f "$tmp"
+}
+
 build_and_install() {
   need_cmd make
   cd "$SRC_DIR"
@@ -136,13 +208,9 @@ build_and_install() {
     --disable-hw-x11 \
     --disable-hw-xft
   log "make -j$JOBS"
-  # Prefer plain nice make: lab-run's 'make -j' pgrep can false-positive on the
-  # parent shell/agent cmdline. Cap JOBS above already; this is user-attended.
   nice -n 10 make -j"$JOBS" || die "make failed"
   nice -n 10 make install || die "make install failed"
 
-  # The real client is the ELF built from server/wrapper.c (execs hedgeytty_server).
-  # Remove any leftover apt-twin shell wrappers / recovery names from older installs.
   rm -f "$BIN_DIR/hedgeytty-fork" "$BIN_DIR/hedgeytty-fork.bin" \
         "$BIN_DIR/hedgeytty.fork-broken"
   if [[ ! -x "$BIN_DIR/hedgeytty" ]]; then
@@ -154,12 +222,7 @@ build_and_install() {
 
   mkdir -p "${HOME}/.config/hedgeytty" "${HOME}/.local/share/hedgeytty" \
            "${HOME}/.local/state/hedgeytty"
-  if [[ -f "${HOME}/.config/hedgeytty/hedgeyttyrc" ]]; then
-    cp -a "${HOME}/.config/hedgeytty/hedgeyttyrc" \
-      "${HOME}/.config/hedgeytty/hedgeyttyrc.bak"
-  fi
-  install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc"
-  install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc.dist"
+  install_user_rc
   [[ -f "${HOME}/.config/hedgeytty/htenvrc.sh" ]] || \
     install -m 0644 "$SRC_DIR/htenvrc.sh" "${HOME}/.config/hedgeytty/htenvrc.sh"
   install -m 0644 "$SRC_DIR/assets/hitomi-icon.png" \
@@ -171,20 +234,26 @@ build_and_install() {
 
 setup_mouse() {
   if [[ "${HEDGEYTTY_SKIP_GPM:-}" == 1 ]]; then
-    log "skipping gpm"
+    log "skipping gpm (HEDGEYTTY_SKIP_GPM=1)"
     return
   fi
-  if [[ -x "$BIN_DIR/hedgeytty-setup-gpm" ]]; then
-    if [[ "$(id -u)" -eq 0 ]]; then
-      "$BIN_DIR/hedgeytty-setup-gpm"
-    elif command -v sudo >/dev/null; then
-      log "configuring gpm via sudo"
-      sudo "$BIN_DIR/hedgeytty-setup-gpm" || log "gpm setup failed — see docs"
-    fi
+  if [[ ! -x "$BIN_DIR/hedgeytty-setup-gpm" ]]; then
+    return
+  fi
+  if ! command -v systemctl >/dev/null 2>&1; then
+    log "systemctl not found — skip gpm setup (console mouse needs systemd gpm on Debian/Ubuntu)"
+    return
+  fi
+  if [[ "$(id -u)" -eq 0 ]]; then
+    "$BIN_DIR/hedgeytty-setup-gpm" || log "gpm setup failed — see hedgeytty/docs/mouse.md"
+  elif command -v sudo >/dev/null; then
+    log "configuring gpm via sudo"
+    sudo "$BIN_DIR/hedgeytty-setup-gpm" || log "gpm setup failed — see hedgeytty/docs/mouse.md"
   fi
 }
 
 main() {
+  refuse_unsupported_os
   log "HedgeyTTY from-source installer (fork of Twin)"
   log "repo: $REPO_URL @$REPO_BRANCH → prefix $PREFIX"
   install_build_deps
@@ -199,11 +268,12 @@ main() {
 Installed.
   run:       $BIN_DIR/hedgeytty          # fork client → hedgeytty_server
   config:    ~/.config/hedgeytty/hedgeyttyrc
-  display:   HTDISPLAY  sockets: /tmp/.HedgeyTTY:*
+  display:   HTDISPLAY  sockets: \$TMPDIR/.HedgeyTTY:* (default /tmp)
   server log:~/.local/state/hedgeytty/server.log
 
 First boot is windowless (menubar + hedgehog). Alt-Up opens a terminal.
 Do not start hedgeytty from inside Twin — Quit Twin first, then run on the bare console.
+Headless --nohw leftovers are reclaimed on the next start (see README).
 
 MSG
 }

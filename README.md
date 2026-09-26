@@ -79,12 +79,37 @@ hedgeytty/
 
 ## Requirements
 
-- Linux virtual console (tested on Ubuntu)
-- Build packages (installer pulls on Debian/Ubuntu): `build-essential`,
-  `autoconf`, `automake`, `libtool`, `pkg-config`, `gpm`, `libgpm-dev`,
-  `imagemagick`, `zlib1g-dev`, `libncurses-dev`, `libltdl-dev` — **not** the
-  `twin` WM binary. X11 (`libx11-dev` / `libxft-dev`) is optional
-  (`HEDGEYTTY_WITH_X11=1`).
+**Supported:** Linux virtual console (Ubuntu/Debian first-class). Needs AF_UNIX
+sockets, the Linux tty driver, and preferably **gpm** for mouse.
+
+**Not supported** (installer refuses up front):
+
+| Platform | Why |
+|---|---|
+| Termux | No Linux VT / gpm console stack |
+| macOS | No VT/gpm; installer disables X11 |
+| Windows / PowerShell / MSYS | No native AF_UNIX + VT/gpm product path |
+| WSL as “console” | Usually a pty, not a real VT — expect attach/`--nohw` semantics, not bare-console UX |
+
+Upstream Twin heritage (termcap/X11 on other Unixes) lives in
+[`README.twin.md`](README.twin.md) — that is **not** the HedgeyTTY product path.
+
+Build packages (installer pulls on Debian/Ubuntu): `build-essential`,
+`autoconf`, `automake`, `libtool`, `pkg-config`, `gpm`, `libgpm-dev`,
+`imagemagick`, `zlib1g-dev`, `libncurses-dev`, `libltdl-dev` — **not** the
+`twin` WM binary. On other Linux distros, install the equivalent packages
+manually if `apt-get` is missing. X11 (`libx11-dev` / `libxft-dev`) is optional
+(`HEDGEYTTY_WITH_X11=1`).
+
+Skip mouse setup with `HEDGEYTTY_SKIP_GPM=1` (or when `systemctl` is absent).
+
+User config: reinstall keeps an existing `~/.config/hedgeytty/hedgeyttyrc` and
+writes the packaged default to `hedgeyttyrc.dist` only.
+
+**`--nohw`:** for attach/debug. Headless servers (no controlling tty) are
+**reclaimed** on the next `hedgeytty` start so a leftover socket cannot brick
+startup. Do not expect a long-lived `--nohw` daemon to survive a later launch
+unless you set `HEDGEYTTY_ALLOW_NESTED=1` (unsafe on a shared console).
 
 Build time is a few minutes on a CPU laptop; prefix defaults to `~/.local`.
 

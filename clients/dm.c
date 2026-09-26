@@ -188,16 +188,16 @@ static byte InitServer(void) {
       if (fd[0] != 1)
         close(fd[0]);
 
-      execl(BINDIR_PREFIX "twin", "twin", "--secure", "--nohw", TwEnvRC, NULL);
-      execlp("twin", "twin", "--secure", "--nohw", TwEnvRC, NULL);
-      fprintf(stderr, "twdm: exec(twin) failed: %s\n", strerror(errno));
+      execl(BINDIR_PREFIX "hedgeytty", "hedgeytty", "--secure", "--nohw", TwEnvRC, NULL);
+      execlp("hedgeytty", "hedgeytty", "--secure", "--nohw", TwEnvRC, NULL);
+      fprintf(stderr, "htdm: exec(hedgeytty) failed: %s\n", strerror(errno));
       exit(1);
       return tfalse;
     case (pid_t)-1:
       /* error */
       close(fd[0]);
       close(fd[1]);
-      fprintf(stderr, "twdm: fork() failed: %s\n", strerror(errno));
+      fprintf(stderr, "htdm: fork() failed: %s\n", strerror(errno));
       return tfalse;
     default:
       /* parent */
@@ -222,13 +222,13 @@ static byte InitServer(void) {
       }
 
       if (i <= 0)
-        fprintf(stderr, "twdm: read() from twin failed: %s\n", strerror(errno));
+        fprintf(stderr, "htdm: read() from hedgeytty failed: %s\n", strerror(errno));
       else
-        fprintf(stderr, "twdm: error starting twin:\n\t%.*s\n", i, buff);
+        fprintf(stderr, "htdm: error starting hedgeytty:\n\t%.*s\n", i, buff);
 
       return tfalse;
     }
-  fprintf(stderr, "twdm: pipe() failed: %s\n", strerror(errno));
+  fprintf(stderr, "htdm: pipe() failed: %s\n", strerror(errno));
   return tfalse;
 }
 
@@ -244,11 +244,11 @@ static byte InitAttach(void) {
   if (use_twdisplay == DM_ATTACH ||
       (use_twdisplay == DM_AUTO && !Tw_option_strcmp(hw_name, "-hw=tty"))) {
 
-    attach = "twattach";
-    path_attach = BINDIR_PREFIX "twattach";
+    attach = "htattach";
+    path_attach = BINDIR_PREFIX "htattach";
   } else {
-    attach = "twdisplay";
-    path_attach = BINDIR_PREFIX "twdisplay";
+    attach = "htdisplay";
+    path_attach = BINDIR_PREFIX "htdisplay";
   }
 
   strncpy(buff + 7, DM_Display, 4);

@@ -6,8 +6,9 @@
  *  Also:
  *   - refuses to steal a console already owned by Twin/HedgeyTTY
  *     (nested start + Quit leaves the outer session broken)
- *   - reclaims orphaned servers (no controlling tty) left after crashes
+ *   - reclaims orphaned servers (tty_nr == 0) left after crashes
  *     or detached --nohw runs, so a stale socket cannot brick startup
+ *   - prepends BINDIR to PATH so Exec hitomi-bg finds the painter
  *   - redirects stderr to a state log so server chatter does not paint
  *     over the menubar on the Linux console
  */
@@ -60,6 +61,13 @@ static int env_truthy(const char *name) {
   return v && v[0] == '1' && v[1] == '\0';
 }
 
+static const char *tmpdir(void) {
+  const char *tmp = getenv("TMPDIR");
+  if (tmp && tmp[0])
+    return tmp;
+  return "/tmp";
+}
+
 /* Linux /proc/<pid>/stat field tty_nr; 0 = no controlling terminal. -1 on error. */
 static int proc_tty_nr(pid_t pid) {
   char path[64], buf[512];
@@ -81,10 +89,73 @@ static int proc_tty_nr(pid_t pid) {
   rp = strrchr(buf, ')');
   if (!rp || rp[1] != ' ')
     return -1;
-  /* after ") ": state ppid pgrp session tty_nr */
   if (sscanf(rp + 2, "%c %*d %*d %*d %d", &state, &tty) != 2)
     return -1;
   return tty;
+}
+
+/* True if pid is hedgeytty_server (comm truncates to hedgeytty_serve). */
+static int is_hedgeytty_server_pid(pid_t pid) {
+  char cpath[64], comm[64], cmdline[256];
+  int fd, n;
+
+  if (pid <= 1)
+    return 0;
+  snprintf(cpath, sizeof cpath, "/proc/%d/comm", (int)pid);
+  fd = open(cpath, O_RDONLY);
+  if (fd >= 0) {
+    n = (int)read(fd, comm, sizeof comm - 1);
+    close(fd);
+    if (n > 0) {
+      comm[n] = '\0';
+      if (comm[n - 1] == '\n')
+        comm[n - 1] = '\0';
+      /* exact truncated server name — not hedgeytty-hitomi-bg / clients */
+      if (strcmp(comm, "hedgeytty_serve") == 0)
+        return 1;
+    }
+  }
+  snprintf(cpath, sizeof cpath, "/proc/%d/cmdline", (int)pid);
+  fd = open(cpath, O_RDONLY);
+  if (fd < 0)
+    return 0;
+  n = (int)read(fd, cmdline, sizeof cmdline - 1);
+  close(fd);
+  if (n <= 0)
+    return 0;
+  cmdline[n] = '\0';
+  return strstr(cmdline, "hedgeytty_server") != NULL;
+}
+
+static int is_twin_server_pid(pid_t pid) {
+  char cpath[64], comm[64], cmdline[256];
+  int fd, n;
+
+  if (pid <= 1)
+    return 0;
+  snprintf(cpath, sizeof cpath, "/proc/%d/comm", (int)pid);
+  fd = open(cpath, O_RDONLY);
+  if (fd >= 0) {
+    n = (int)read(fd, comm, sizeof comm - 1);
+    close(fd);
+    if (n > 0) {
+      comm[n] = '\0';
+      if (comm[n - 1] == '\n')
+        comm[n - 1] = '\0';
+      if (strcmp(comm, "twin") == 0 || strcmp(comm, "twin_server") == 0)
+        return 1;
+    }
+  }
+  snprintf(cpath, sizeof cpath, "/proc/%d/cmdline", (int)pid);
+  fd = open(cpath, O_RDONLY);
+  if (fd < 0)
+    return 0;
+  n = (int)read(fd, cmdline, sizeof cmdline - 1);
+  close(fd);
+  if (n <= 0)
+    return 0;
+  cmdline[n] = '\0';
+  return strstr(cmdline, "twin_server") != NULL || strstr(cmdline, "/twin") != NULL;
 }
 
 /*
@@ -94,27 +165,23 @@ static int proc_tty_nr(pid_t pid) {
 static int unix_path_inode(const char *path, unsigned long *out_ino) {
   FILE *f;
   char line[768];
-  size_t plen;
 
   if (!path || !out_ino)
     return -1;
-  plen = strlen(path);
   f = fopen("/proc/net/unix", "r");
   if (!f)
     return -1;
-  if (!fgets(line, sizeof line, f)) { /* header */
+  if (!fgets(line, sizeof line, f)) {
     fclose(f);
     return -1;
   }
   while (fgets(line, sizeof line, f)) {
-    char *p = line;
-    unsigned long ino = 0;
-    int slot = 0;
     char *save = NULL;
     char *tok;
+    unsigned long ino = 0;
+    int slot = 0;
 
-    /* fields: Num RefCount Protocol Flags Type St Inode Path */
-    for (tok = strtok_r(p, " \t\n", &save); tok; tok = strtok_r(NULL, " \t\n", &save)) {
+    for (tok = strtok_r(line, " \t\n", &save); tok; tok = strtok_r(NULL, " \t\n", &save)) {
       if (slot == 6) {
         ino = strtoul(tok, NULL, 10);
       } else if (slot >= 7) {
@@ -127,13 +194,11 @@ static int unix_path_inode(const char *path, unsigned long *out_ino) {
       }
       slot++;
     }
-    (void)plen;
   }
   fclose(f);
   return -1;
 }
 
-/* Find the process holding the listening socket for path (not an accept() helper). */
 static pid_t sock_listener_pid(const char *path) {
   unsigned long ino;
   char want[64];
@@ -153,7 +218,6 @@ static pid_t sock_listener_pid(const char *path) {
     DIR *fd;
     struct dirent *fe;
     pid_t pid;
-    const char *s;
 
     if (!isdigit((unsigned char)pe->d_name[0]))
       continue;
@@ -175,32 +239,14 @@ static pid_t sock_listener_pid(const char *path) {
       link[n] = '\0';
       if (strcmp(link, want) != 0)
         continue;
-      /* Prefer hedgeytty_server / twin; otherwise first match. */
-      {
-        char cpath[64], comm[64];
-        int cfd, cn;
-        snprintf(cpath, sizeof cpath, "/proc/%s/comm", pe->d_name);
-        cfd = open(cpath, O_RDONLY);
-        comm[0] = '\0';
-        if (cfd >= 0) {
-          cn = (int)read(cfd, comm, sizeof comm - 1);
-          close(cfd);
-          if (cn > 0) {
-            comm[cn] = '\0';
-            if (comm[cn - 1] == '\n')
-              comm[cn - 1] = '\0';
-          }
-        }
-        s = comm;
-        if (strstr(s, "hedgeytty") || strstr(s, "twin")) {
-          found = pid;
-          closedir(fd);
-          closedir(proc);
-          return found;
-        }
-        if (found < 0)
-          found = pid;
+      if (is_hedgeytty_server_pid(pid) || is_twin_server_pid(pid)) {
+        found = pid;
+        closedir(fd);
+        closedir(proc);
+        return found;
       }
+      if (found < 0)
+        found = pid;
     }
     closedir(fd);
   }
@@ -228,7 +274,7 @@ static void reclaim_server(const char *path, pid_t peer) {
     unlink(path);
 }
 
-/* Kill every hedgeytty_server with no controlling tty (crash / --nohw leftovers). */
+/* Kill every hedgeytty_server with tty_nr == 0 (crash / --nohw leftovers). */
 static void reap_orphan_hedgeytty_servers(void) {
   DIR *proc;
   struct dirent *pe;
@@ -237,30 +283,17 @@ static void reap_orphan_hedgeytty_servers(void) {
   if (!proc)
     return;
   while ((pe = readdir(proc)) != NULL) {
-    char cpath[64], comm[64];
-    int cfd, cn;
     pid_t pid;
+    int tty;
 
     if (!isdigit((unsigned char)pe->d_name[0]))
       continue;
     pid = (pid_t)atoi(pe->d_name);
-    if (pid <= 1)
+    if (!is_hedgeytty_server_pid(pid))
       continue;
-    snprintf(cpath, sizeof cpath, "/proc/%s/comm", pe->d_name);
-    cfd = open(cpath, O_RDONLY);
-    if (cfd < 0)
-      continue;
-    cn = (int)read(cfd, comm, sizeof comm - 1);
-    close(cfd);
-    if (cn <= 0)
-      continue;
-    comm[cn] = '\0';
-    if (comm[cn - 1] == '\n')
-      comm[cn - 1] = '\0';
-    /* Linux truncates comm to 15 chars: "hedgeytty_serve" */
-    if (!strstr(comm, "hedgeytty"))
-      continue;
-    if (proc_tty_nr(pid) <= 0)
+    tty = proc_tty_nr(pid);
+    /* Only proven no-CTTY; tty_nr == -1 means unknown — do not kill. */
+    if (tty == 0)
       reclaim_server(NULL, pid);
   }
   closedir(proc);
@@ -269,7 +302,7 @@ static void reap_orphan_hedgeytty_servers(void) {
 /*
  * Connect to path. Returns:
  *   0  — free (missing or stale; stale unlinked)
- *   1  — live server we must not displace (same console)
+ *   1  — live server we must not displace (same console / unknown peer)
  *  -1  — live but reclaimed / other tty (caller may proceed)
  */
 static int probe_server_sock(const char *path) {
@@ -292,12 +325,12 @@ static int probe_server_sock(const char *path) {
     }
   }
 
-  /* Listener may still exist after a half-unlink; always resolve via /proc. */
   peer = sock_listener_pid(path);
   our_tty = proc_tty_nr(getpid());
   peer_tty = proc_tty_nr(peer);
 
-  if (peer > 1 && peer_tty <= 0) {
+  /* Proven orphan (no CTTY). Unknown tty (-1) is not an orphan. */
+  if (peer > 1 && peer_tty == 0) {
     reclaim_server(path, peer);
     return -1;
   }
@@ -317,55 +350,111 @@ static int probe_server_sock(const char *path) {
   }
 
   if (!connected) {
-    /* Path gone or dead name — drop the node; orphans already reaped above. */
     if (have_node)
       unlink(path);
-    /* Listener on other tty without connectable path: leave it alone. */
     return 0;
   }
 
-  /* Connected: refresh listener identity (path inode may have changed). */
   peer = sock_listener_pid(path);
   peer_tty = proc_tty_nr(peer);
-  if (peer > 1 && peer_tty <= 0) {
+  if (peer > 1 && peer_tty == 0) {
     reclaim_server(path, peer);
     return -1;
   }
   if (our_tty > 0 && peer > 1 && peer_tty == our_tty)
     return 1;
+  /* Connectable but cannot identify listener — refuse, never unlink. */
   if (peer <= 1) {
-    reclaim_server(path, (pid_t)-1);
-    return -1;
+    say("refusing to start — live display socket with unknown owner.");
+    return 1;
+  }
+  /* Unknown tty on a live peer: refuse rather than displace. */
+  if (peer_tty < 0) {
+    say("refusing to start — cannot read peer console state.");
+    return 1;
   }
   return -1;
 }
 
-/*
- * Starting on top of an existing Twin/HedgeyTTY console is unsafe: the tty
- * driver grabs the same /dev/ttyN, and Quit restores keyboard/video state
- * the outer server still expects.
- */
+/* Collect .HedgeyTTY: / .Twin: paths from TMPDIR dirent + /proc/net/unix. */
+static int collect_display_socks(const char *suffix_prefix, char out[][108], int max) {
+  DIR *d;
+  struct dirent *e;
+  FILE *f;
+  char line[768];
+  int n = 0;
+  const char *tmp = tmpdir();
+  size_t prelen = strlen(suffix_prefix);
+
+  d = opendir(tmp);
+  if (d) {
+    while ((e = readdir(d)) != NULL && n < max) {
+      if (strncmp(e->d_name, suffix_prefix, prelen) != 0)
+        continue;
+      if (snprintf(out[n], sizeof out[n], "%s/%s", tmp, e->d_name) < (int)sizeof out[n])
+        n++;
+    }
+    closedir(d);
+  }
+
+  f = fopen("/proc/net/unix", "r");
+  if (!f)
+    return n;
+  if (!fgets(line, sizeof line, f)) {
+    fclose(f);
+    return n;
+  }
+  while (fgets(line, sizeof line, f) && n < max) {
+    char *save = NULL;
+    char *tok;
+    int slot = 0;
+    for (tok = strtok_r(line, " \t\n", &save); tok; tok = strtok_r(NULL, " \t\n", &save)) {
+      if (slot >= 7) {
+        const char *base = strrchr(tok, '/');
+        base = base ? base + 1 : tok;
+        if (strncmp(base, suffix_prefix, prelen) == 0) {
+          int i, dup = 0;
+          for (i = 0; i < n; i++) {
+            if (strcmp(out[i], tok) == 0) {
+              dup = 1;
+              break;
+            }
+          }
+          if (!dup && strlen(tok) < sizeof out[0]) {
+            strncpy(out[n], tok, sizeof out[n] - 1);
+            out[n][sizeof out[n] - 1] = '\0';
+            n++;
+          }
+        }
+        break;
+      }
+      slot++;
+    }
+  }
+  fclose(f);
+  return n;
+}
+
 static int refuse_nested_console(void) {
-  int i;
-  char path[64];
+  char paths[64][108];
+  int i, n;
 
   if (env_truthy("HEDGEYTTY_ALLOW_NESTED"))
     return 0;
 
-  /* Belt-and-suspenders: never leave headless servers bricking :0. */
   reap_orphan_hedgeytty_servers();
 
-  for (i = 0; i < 8; i++) {
-    snprintf(path, sizeof path, "/tmp/.Twin:%d", i);
-    if (probe_server_sock(path) == 1) {
+  n = collect_display_socks(".Twin:", paths, 64);
+  for (i = 0; i < n; i++) {
+    if (probe_server_sock(paths[i]) == 1) {
       say("refusing to start — apt Twin already running on this console.");
       say("Quit Twin (File → Quit), then run hedgeytty on the bare console.");
       return 1;
     }
   }
-  for (i = 0; i < 8; i++) {
-    snprintf(path, sizeof path, "/tmp/.HedgeyTTY:%d", i);
-    if (probe_server_sock(path) == 1) {
+  n = collect_display_socks(".HedgeyTTY:", paths, 64);
+  for (i = 0; i < n; i++) {
+    if (probe_server_sock(paths[i]) == 1) {
       say("refusing to start — HedgeyTTY already running on this console.");
       say("Quit that session first (File → Quit).");
       return 1;
@@ -414,12 +503,27 @@ static void redirect_stderr_to_log(void) {
   }
 }
 
+/* Twin Exec often sees a PATH without BINDIR; guarantee the install prefix. */
+static void prepend_bindir_to_path(void) {
+  const char *old = getenv("PATH");
+  char neu[1024];
+
+  if (old && strstr(old, BINDIR))
+    return;
+  if (old && *old)
+    snprintf(neu, sizeof neu, "%s:%s", BINDIR, old);
+  else
+    snprintf(neu, sizeof neu, "%s:/usr/bin:/bin", BINDIR);
+  setenv("PATH", neu, 1);
+}
+
 int main(int argc, char *argv[]) {
   (void)argc;
 
   if (refuse_nested_console())
     return 75;
 
+  prepend_bindir_to_path();
   redirect_stderr_to_log();
 
   argv[0] = bindir_hedgeytty_server;

@@ -25,20 +25,37 @@ static const trgb DESK_R = 180, DESK_G = 60, DESK_B = 140; /* magenta-ish */
 
 /* Bridge apt Twin sockets/auth into HedgeyTTY names so libht can attach
  * while both stacks coexist (same wire protocol, different on-disk names).
- * Socket symlinks are temporary — leaving them would block hedgeytty :0. */
+ * Bridges are ephemeral — permanent auth/sock links brick :0 or leak secrets. */
 static int bridged_socks[8];
 static int bridged_n;
+static int bridged_auth;
+
+static void unbridge_apt_twin(void);
+
+static const char *tmpdir(void) {
+  const char *tmp = getenv("TMPDIR");
+  if (tmp && tmp[0])
+    return tmp;
+  return "/tmp";
+}
 
 static void bridge_apt_twin(void) {
   const char *home = getenv("HOME");
-  char twin_sock[64], ht_sock[64], twin_auth[512], ht_auth[512];
+  const char *tmp = tmpdir();
+  char twin_sock[128], ht_sock[128], twin_auth[512], ht_auth[512];
   struct stat st;
   int n;
+  static int atexit_hooked;
 
   bridged_n = 0;
+  bridged_auth = 0;
+  if (!atexit_hooked) {
+    atexit(unbridge_apt_twin);
+    atexit_hooked = 1;
+  }
   for (n = 0; n < 8; n++) {
-    snprintf(twin_sock, sizeof twin_sock, "/tmp/.Twin:%d", n);
-    snprintf(ht_sock, sizeof ht_sock, "/tmp/.HedgeyTTY:%d", n);
+    snprintf(twin_sock, sizeof twin_sock, "%s/.Twin:%d", tmp, n);
+    snprintf(ht_sock, sizeof ht_sock, "%s/.HedgeyTTY:%d", tmp, n);
     if (lstat(ht_sock, &st) == 0)
       continue; /* real socket or existing link — do not touch */
     if (stat(twin_sock, &st) == 0 && S_ISSOCK(st.st_mode)) {
@@ -50,18 +67,27 @@ static void bridge_apt_twin(void) {
     return;
   snprintf(twin_auth, sizeof twin_auth, "%s/.TwinAuth", home);
   snprintf(ht_auth, sizeof ht_auth, "%s/.HedgeyTTYAuth", home);
-  if (stat(twin_auth, &st) == 0 && S_ISREG(st.st_mode) && lstat(ht_auth, &st) != 0)
-    symlink(twin_auth, ht_auth);
+  if (stat(twin_auth, &st) == 0 && S_ISREG(st.st_mode) && lstat(ht_auth, &st) != 0) {
+    if (symlink(twin_auth, ht_auth) == 0)
+      bridged_auth = 1;
+  }
 }
 
-static void unbridge_apt_twin_socks(void) {
-  char ht_sock[64];
+static void unbridge_apt_twin(void) {
+  const char *home = getenv("HOME");
+  const char *tmp = tmpdir();
+  char ht_sock[128], ht_auth[512];
   int i;
   for (i = 0; i < bridged_n; i++) {
-    snprintf(ht_sock, sizeof ht_sock, "/tmp/.HedgeyTTY:%d", bridged_socks[i]);
+    snprintf(ht_sock, sizeof ht_sock, "%s/.HedgeyTTY:%d", tmp, bridged_socks[i]);
     unlink(ht_sock); /* only removes our symlink */
   }
   bridged_n = 0;
+  if (bridged_auth && home && *home) {
+    snprintf(ht_auth, sizeof ht_auth, "%s/.HedgeyTTYAuth", home);
+    unlink(ht_auth); /* only removes our symlink */
+    bridged_auth = 0;
+  }
 }
 
 static byte open_twin(void) {
@@ -95,7 +121,7 @@ static byte open_twin(void) {
       pclose(fp);
     }
   }
-  unbridge_apt_twin_socks();
+  unbridge_apt_twin();
   return ok;
 }
 

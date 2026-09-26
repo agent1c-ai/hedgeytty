@@ -1,5 +1,5 @@
 /*
- *  findtwin.c  --  find a running twin server
+ *  findtwin.c  --  find a running HedgeyTTY (or Twin) server
  *
  *  This program is placed in the public domain.
  *
@@ -41,11 +41,29 @@ static void try_TwOpen(const char *dpy) {
 
 #define ishex(c) (((c) >= '0' && (c) <= '9') || ((c) >= 'a' && (c) <= 'f'))
 
-static int match_twsocket(const struct dirent *d) {
+/* Match .HedgeyTTY:N or legacy .Twin:N (display hex up to 3 digits). */
+static int match_display_socket(const struct dirent *d) {
   const char *s = d->d_name;
+  const char *colon;
 
-  return !strncmp(s, ".Twin:", 6) && ishex(s[6]) &&
-         (!s[7] || (ishex(s[7]) && (!s[8] || (ishex(s[8]) && !s[9]))));
+  if (!strncmp(s, ".HedgeyTTY:", 11))
+    colon = s + 10;
+  else if (!strncmp(s, ".Twin:", 6))
+    colon = s + 5;
+  else
+    return 0;
+  if (*colon != ':')
+    return 0;
+  colon++;
+  if (!ishex(colon[0]))
+    return 0;
+  if (!colon[1])
+    return 1;
+  if (!ishex(colon[1]))
+    return 0;
+  if (!colon[2])
+    return 1;
+  return ishex(colon[2]) && !colon[3];
 }
 
 #if defined(TW_HAVE_SCANDIR) && (defined(TW_HAVE_VERSIONSORT) || defined(TW_HAVE_ALPHASORT))
@@ -63,17 +81,20 @@ static void search_unix_socket(void) {
 #else
 #define my_sort alphasort
 #endif
-  /* versionsort() declaration is tricky to pull from system headers */
   int my_sort(const struct dirent **, const struct dirent **);
 
   struct dirent **namelist;
   char *s;
-  int n = scandir(tmpdir(), &namelist, match_twsocket, my_sort);
+  int n = scandir(tmpdir(), &namelist, match_display_socket, my_sort);
 
   while (n > 0) {
     s = namelist[0]->d_name;
-
-    try_TwOpen(s + 5);
+    /* TwOpen wants ":N" — skip ".HedgeyTTY" or ".Twin" prefix before ':' */
+    {
+      const char *colon = strchr(s, ':');
+      if (colon)
+        try_TwOpen(colon);
+    }
 
     namelist++;
     n--;
@@ -84,27 +105,23 @@ static void search_unix_socket(void) {
 int main(int argc, char *argv[]) {
   (void)argc;
 
-  /* first: if given, check _ONLY_ command-line specified servers */
   if (*++argv) {
     do {
       try_TwOpen(*argv);
     } while (*++argv);
 
-    /* bomb out */
     return 1;
   }
 
   if (!TwCheckMagic(findtwin_magic)) {
-    fprintf(stderr, "twfindtwin: %s%s\n", TwStrError(TwErrno),
+    fprintf(stderr, "htfindtwin: %s%s\n", TwStrError(TwErrno),
             TwStrErrorDetail(TwErrno, TwErrnoDetail));
     return 1;
   }
 
-  /* then, check for environment HTDISPLAY */
   try_TwOpen(NULL);
 
-#if defined(TW_HAVE_SCANDIR) && defined(TW_HAVE_ALPHASORT)
-  /* last resort: exhaustive search in /tmp */
+#if defined(TW_HAVE_SCANDIR) && (defined(TW_HAVE_VERSIONSORT) || defined(TW_HAVE_ALPHASORT))
   search_unix_socket();
 #endif
 
