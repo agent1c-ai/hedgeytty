@@ -23,11 +23,15 @@ Equivalent:
 curl -fsSL https://raw.githubusercontent.com/agent1c-ai/hedgeytty/main/install.sh | sh
 ```
 
-Then on a text console:
+Then on a **bare** Linux text console (not inside Twin / not on a pty):
 
 ```bash
 hedgeytty
 ```
+
+`hedgeytty` is the forked client binary (it execs `hedgeytty_server`). It is **not** a
+shell wrapper around apt `twin`. Starting it while Twin already owns the console
+is refused (nested start + Quit breaks the outer TTY).
 
 First boot is **windowless** (menubar + Hitomi hedgehog). **Alt-Up** opens a terminal.
 
@@ -66,6 +70,7 @@ hedgeyttyrc                # package default RC (sysconfdir + user copy)
 htenvrc.sh
 assets/hitomi-icon.png
 clients/hitomi-bg.c        # hedgeytty-hitomi-bg
+server/wrapper.c           # `hedgeytty` client → exec hedgeytty_server
 hedgeytty/
   scripts/setup-gpm.sh
   docs/mouse.md

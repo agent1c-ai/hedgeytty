@@ -47,6 +47,9 @@ install_build_deps() {
   command -v curl >/dev/null || missing=1
   [[ -f /usr/include/X11/Xlib.h ]] || missing=1
   [[ -f /usr/include/zlib.h ]] || missing=1
+  # gpm daemon alone is not enough — without headers/lib, mouse compiles out
+  [[ -f /usr/include/gpm.h ]] || missing=1
+  [[ -e /usr/lib/x86_64-linux-gnu/libgpm.so || -e /usr/lib/libgpm.so ]] || missing=1
 
   if [[ "$missing" -eq 0 ]]; then
     log "build dependencies already present"
@@ -108,7 +111,20 @@ build_and_install() {
     make -j"$JOBS"
     make install
   fi
-  mkdir -p "${HOME}/.config/hedgeytty" "${HOME}/.local/share/hedgeytty"
+
+  # The real client is the ELF built from server/wrapper.c (execs hedgeytty_server).
+  # Remove any leftover apt-twin shell wrappers / recovery names from older installs.
+  rm -f "$BIN_DIR/hedgeytty-fork" "$BIN_DIR/hedgeytty-fork.bin" \
+        "$BIN_DIR/hedgeytty.fork-broken"
+  if [[ ! -x "$BIN_DIR/hedgeytty" ]]; then
+    die "make install did not produce $BIN_DIR/hedgeytty"
+  fi
+  if head -c 4 "$BIN_DIR/hedgeytty" | grep -q '#!'; then
+    die "$BIN_DIR/hedgeytty is a script; expected the forked ELF client"
+  fi
+
+  mkdir -p "${HOME}/.config/hedgeytty" "${HOME}/.local/share/hedgeytty" \
+           "${HOME}/.local/state/hedgeytty"
   if [[ ! -f "${HOME}/.config/hedgeytty/hedgeyttyrc" ]]; then
     install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc"
   else
@@ -151,11 +167,13 @@ main() {
   cat <<MSG
 
 Installed.
-  run:       $BIN_DIR/hedgeytty
+  run:       $BIN_DIR/hedgeytty          # fork client → hedgeytty_server
   config:    ~/.config/hedgeytty/hedgeyttyrc
   display:   HTDISPLAY  sockets: /tmp/.HedgeyTTY:*
+  server log:~/.local/state/hedgeytty/server.log
 
 First boot is windowless (menubar + hedgehog). Alt-Up opens a terminal.
+Do not start hedgeytty from inside Twin — Quit Twin first, then run on the bare console.
 
 MSG
 }
