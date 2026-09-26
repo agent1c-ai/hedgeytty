@@ -33,6 +33,9 @@ Then on a text console:
 hedgeytty
 ```
 
+First boot shows a **windowless** desktop (top menu bar + hedgehog wallpaper).
+Open a terminal with **Alt-Up** when you want one.
+
 ## What this fork adds
 
 | Piece | Why |
@@ -41,7 +44,8 @@ hedgeytty
 | **Socket + term modules on by default** | External clients (`twterm`, agents, etc.) can open windows without hunting the Modules menu. |
 | **Hitomi hedgehog desktop** | `hedgeytty-hitomi-bg` paints truecolor UTF-8 half-blocks through libtw (Twin 1.0’s twinrc/ANSI colors truncate Magenta→Blue and break `twsetroot` ANSI). |
 | **TurboVision-style menus** | Always-visible menubar, left-click to open (from upstream sample, kept as default). |
-| **`hedgeytty` launcher** | Thin wrapper around `twin` with PATH + mouse hints. |
+| **`hedgeytty` launcher** | Run `hedgeytty` from the CLI (wraps `twin` with PATH + mouse hints). |
+| **Windowless first boot** | No auto terminal — first paint is menubar + hedgehog desktop. Alt-Up opens a term. |
 
 We intentionally keep Twin’s server/protocol intact. HedgeyTTY is Twin plus
 opinionated packaging, config, and desktop chrome.
