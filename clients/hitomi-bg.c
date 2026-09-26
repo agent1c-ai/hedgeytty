@@ -111,7 +111,19 @@ static void blend(byte *r, byte *g, byte *b, byte a, byte br, byte bg, byte bb) 
   *b = (byte)((*b * a + bb * ia) / 255);
 }
 
-/* Load trimmed icon as RGBA via magick; *out_w / *out_h are pixel size. */
+/* ImageMagick 7 = magick; Ubuntu packages ship IM6 as convert. */
+static const char *im_bin(void) {
+  static const char *cached;
+  if (cached)
+    return cached;
+  if (system("command -v magick >/dev/null 2>&1") == 0)
+    return cached = "magick";
+  if (system("command -v convert >/dev/null 2>&1") == 0)
+    return cached = "convert";
+  return cached = NULL;
+}
+
+/* Load trimmed icon as RGBA; *out_w / *out_h are pixel size. */
 static byte *load_rgba(const char *png, int target_cols, int target_cell_rows, int *out_w,
                        int *out_h) {
   char cmd[1024];
@@ -120,16 +132,22 @@ static byte *load_rgba(const char *png, int target_cols, int target_cell_rows, i
   size_t need, got;
   int pw = target_cols;
   int ph = target_cell_rows * 2; /* half-block = 2 pixels tall */
+  const char *im = im_bin();
+
+  if (!im) {
+    fprintf(stderr, "hedgeytty-hitomi-bg: need ImageMagick (magick or convert)\n");
+    return NULL;
+  }
 
   /* Resize preserving aspect into a box; then we letterbox onto desk. */
   snprintf(cmd, sizeof cmd,
-           "magick '%s' -trim +repage -resize %dx%d -background none -gravity center "
+           "%s '%s' -trim +repage -resize %dx%d -background none -gravity center "
            "-extent %dx%d RGBA:-",
-           png, pw, ph, pw, ph);
+           im, png, pw, ph, pw, ph);
 
   fp = popen(cmd, "r");
   if (!fp) {
-    fprintf(stderr, "hedgeytty-hitomi-bg: popen magick failed: %s\n", strerror(errno));
+    fprintf(stderr, "hedgeytty-hitomi-bg: popen %s failed: %s\n", im, strerror(errno));
     return NULL;
   }
   need = (size_t)pw * (size_t)ph * 4;
@@ -141,7 +159,7 @@ static byte *load_rgba(const char *png, int target_cols, int target_cell_rows, i
   got = fread(buf, 1, need, fp);
   pclose(fp);
   if (got != need) {
-    fprintf(stderr, "hedgeytty-hitomi-bg: magick RGBA read %zu/%zu bytes\n", got, need);
+    fprintf(stderr, "hedgeytty-hitomi-bg: %s RGBA read %zu/%zu bytes\n", im, got, need);
     free(buf);
     return NULL;
   }
