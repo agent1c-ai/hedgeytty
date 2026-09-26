@@ -49,7 +49,8 @@ int dock_run(Dock *d) {
   }
   dock_layout_slots(d);
 
-  if (!(mp = TwCreateMsgPort(32, "htdock")) ||
+  /* TwCreateMsgPort(NameLen, name) — first arg is name length, not queue size. */
+  if (!(mp = TwCreateMsgPort(6, "htdock")) ||
       !(menu = TwCreateMenu(TCOL(tblack, twhite), TCOL(tblack, tgreen), TCOL(tBLACK, twhite),
                             TCOL(tBLACK, tblack), TCOL(tred, twhite), TCOL(tred, tgreen),
                             (byte)0)) ||
