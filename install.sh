@@ -136,13 +136,10 @@ build_and_install() {
     --disable-hw-x11 \
     --disable-hw-xft
   log "make -j$JOBS"
-  if command -v lab-run >/dev/null 2>&1; then
-    lab-run -- make -j"$JOBS" || die "build failed or refused by lab-run (free RAM / wait)"
-    lab-run -- make install || die "make install failed or refused by lab-run"
-  else
-    make -j"$JOBS" || die "make failed"
-    make install || die "make install failed"
-  fi
+  # Prefer plain nice make: lab-run's 'make -j' pgrep can false-positive on the
+  # parent shell/agent cmdline. Cap JOBS above already; this is user-attended.
+  nice -n 10 make -j"$JOBS" || die "make failed"
+  nice -n 10 make install || die "make install failed"
 
   # The real client is the ELF built from server/wrapper.c (execs hedgeytty_server).
   # Remove any leftover apt-twin shell wrappers / recovery names from older installs.
