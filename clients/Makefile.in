@@ -95,7 +95,7 @@ bin_PROGRAMS = htattach$(EXEEXT) htcat$(EXEEXT) htclip$(EXEEXT) \
 	htevent$(EXEEXT) htfindtwin$(EXEEXT) htlsmsgport$(EXEEXT) \
 	htlsobj$(EXEEXT) htsendmsg$(EXEEXT) htsetroot$(EXEEXT) \
 	htsysmon$(EXEEXT) htterm$(EXEEXT) htthreadtest$(EXEEXT) \
-	hedgeytty_hitomi_bg$(EXEEXT)
+	hedgeytty_hitomi_bg$(EXEEXT) htdock$(EXEEXT)
 sbin_PROGRAMS = htdm$(EXEEXT)
 subdir = clients
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -147,6 +147,12 @@ am_htdm_OBJECTS = dm.$(OBJEXT)
 htdm_OBJECTS = $(am_htdm_OBJECTS)
 htdm_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
+am__dirstamp = $(am__leading_dot)dirstamp
+am_htdock_OBJECTS = dock/main.$(OBJEXT) dock/dock_core.$(OBJEXT) \
+	dock/dock_state.$(OBJEXT) dock/dock_render.$(OBJEXT) \
+	dock/dock_input.$(OBJEXT) dock/dock_app.$(OBJEXT)
+htdock_OBJECTS = $(am_htdock_OBJECTS)
+htdock_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am_htevent_OBJECTS = event.$(OBJEXT) util.$(OBJEXT)
 htevent_OBJECTS = $(am_htevent_OBJECTS)
 htevent_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -198,7 +204,10 @@ am__depfiles_remade = ./$(DEPDIR)/attach.Po ./$(DEPDIR)/cat.Po \
 	./$(DEPDIR)/lsobj.Po ./$(DEPDIR)/pty.Po ./$(DEPDIR)/sendmsg.Po \
 	./$(DEPDIR)/setroot.Po ./$(DEPDIR)/sysmon.Po \
 	./$(DEPDIR)/term.Po ./$(DEPDIR)/threadtest.Po \
-	./$(DEPDIR)/util.Po
+	./$(DEPDIR)/util.Po dock/$(DEPDIR)/dock_app.Po \
+	dock/$(DEPDIR)/dock_core.Po dock/$(DEPDIR)/dock_input.Po \
+	dock/$(DEPDIR)/dock_render.Po dock/$(DEPDIR)/dock_state.Po \
+	dock/$(DEPDIR)/main.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -221,14 +230,14 @@ am__v_CCLD_1 =
 SOURCES = $(hedgeytty_hitomi_bg_SOURCES) $(htattach_SOURCES) \
 	$(htcat_SOURCES) $(htclip_SOURCES) $(htclutter_SOURCES) \
 	$(htcuckoo_SOURCES) $(htdialog_SOURCES) $(htdm_SOURCES) \
-	$(htevent_SOURCES) $(htfindtwin_SOURCES) \
+	$(htdock_SOURCES) $(htevent_SOURCES) $(htfindtwin_SOURCES) \
 	$(htlsmsgport_SOURCES) $(htlsobj_SOURCES) $(htsendmsg_SOURCES) \
 	$(htsetroot_SOURCES) $(htsysmon_SOURCES) $(htterm_SOURCES) \
 	$(htthreadtest_SOURCES)
 DIST_SOURCES = $(hedgeytty_hitomi_bg_SOURCES) $(htattach_SOURCES) \
 	$(htcat_SOURCES) $(htclip_SOURCES) $(htclutter_SOURCES) \
 	$(htcuckoo_SOURCES) $(htdialog_SOURCES) $(htdm_SOURCES) \
-	$(htevent_SOURCES) $(htfindtwin_SOURCES) \
+	$(htdock_SOURCES) $(htevent_SOURCES) $(htfindtwin_SOURCES) \
 	$(htlsmsgport_SOURCES) $(htlsobj_SOURCES) $(htsendmsg_SOURCES) \
 	$(htsetroot_SOURCES) $(htsysmon_SOURCES) $(htterm_SOURCES) \
 	$(htthreadtest_SOURCES)
@@ -474,7 +483,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = mapscrn
-AM_CPPFLAGS = -I$(top_srcdir)/include -DDATADIR="\"$(datadir)/hedgeytty\""
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(srcdir)/dock -DDATADIR="\"$(datadir)/hedgeytty\"" -DBINDIR="\"$(bindir)\""
 htattach_SOURCES = attach.c
 htcat_SOURCES = cat.c
 htclip_SOURCES = clip.c
@@ -492,6 +501,9 @@ htsysmon_SOURCES = sysmon.c util.c
 htterm_SOURCES = pty.c term.c util.c
 htthreadtest_SOURCES = threadtest.c
 hedgeytty_hitomi_bg_SOURCES = hitomi-bg.c
+htdock_SOURCES = dock/main.c dock/dock_core.c dock/dock_state.c dock/dock_render.c \
+	dock/dock_input.c dock/dock_app.c
+
 htattach_LDADD = $(LIBHT)
 htcat_LDADD = $(LIBHT)
 htclip_LDADD = $(LIBHT)
@@ -509,6 +521,7 @@ htsysmon_LDADD = $(LIBHT)
 htterm_LDADD = $(LIBHT) $(LIBTUTF)
 htthreadtest_LDADD = $(LIBHT) $(LIBPTHREAD)
 hedgeytty_hitomi_bg_LDADD = $(LIBHT)
+htdock_LDADD = $(LIBHT)
 all: all-recursive
 
 .SUFFIXES:
@@ -662,6 +675,28 @@ htdialog$(EXEEXT): $(htdialog_OBJECTS) $(htdialog_DEPENDENCIES) $(EXTRA_htdialog
 htdm$(EXEEXT): $(htdm_OBJECTS) $(htdm_DEPENDENCIES) $(EXTRA_htdm_DEPENDENCIES) 
 	@rm -f htdm$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(htdm_OBJECTS) $(htdm_LDADD) $(LIBS)
+dock/$(am__dirstamp):
+	@$(MKDIR_P) dock
+	@: >>dock/$(am__dirstamp)
+dock/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) dock/$(DEPDIR)
+	@: >>dock/$(DEPDIR)/$(am__dirstamp)
+dock/main.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+dock/dock_core.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+dock/dock_state.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+dock/dock_render.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+dock/dock_input.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+dock/dock_app.$(OBJEXT): dock/$(am__dirstamp) \
+	dock/$(DEPDIR)/$(am__dirstamp)
+
+htdock$(EXEEXT): $(htdock_OBJECTS) $(htdock_DEPENDENCIES) $(EXTRA_htdock_DEPENDENCIES) 
+	@rm -f htdock$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(htdock_OBJECTS) $(htdock_LDADD) $(LIBS)
 
 htevent$(EXEEXT): $(htevent_OBJECTS) $(htevent_DEPENDENCIES) $(EXTRA_htevent_DEPENDENCIES) 
 	@rm -f htevent$(EXEEXT)
@@ -701,6 +736,7 @@ htthreadtest$(EXEEXT): $(htthreadtest_OBJECTS) $(htthreadtest_DEPENDENCIES) $(EX
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f dock/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
@@ -724,6 +760,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/term.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/threadtest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/dock_app.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/dock_core.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/dock_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/dock_render.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/dock_state.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@dock/$(DEPDIR)/main.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -952,6 +994,8 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
+	-$(am__rm_f) dock/$(DEPDIR)/$(am__dirstamp)
+	-$(am__rm_f) dock/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -981,6 +1025,12 @@ distclean: distclean-recursive
 	-rm -f ./$(DEPDIR)/term.Po
 	-rm -f ./$(DEPDIR)/threadtest.Po
 	-rm -f ./$(DEPDIR)/util.Po
+	-rm -f dock/$(DEPDIR)/dock_app.Po
+	-rm -f dock/$(DEPDIR)/dock_core.Po
+	-rm -f dock/$(DEPDIR)/dock_input.Po
+	-rm -f dock/$(DEPDIR)/dock_render.Po
+	-rm -f dock/$(DEPDIR)/dock_state.Po
+	-rm -f dock/$(DEPDIR)/main.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -1046,6 +1096,12 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f ./$(DEPDIR)/term.Po
 	-rm -f ./$(DEPDIR)/threadtest.Po
 	-rm -f ./$(DEPDIR)/util.Po
+	-rm -f dock/$(DEPDIR)/dock_app.Po
+	-rm -f dock/$(DEPDIR)/dock_core.Po
+	-rm -f dock/$(DEPDIR)/dock_input.Po
+	-rm -f dock/$(DEPDIR)/dock_render.Po
+	-rm -f dock/$(DEPDIR)/dock_state.Po
+	-rm -f dock/$(DEPDIR)/main.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1092,6 +1148,8 @@ install-exec-hook:
 	$(LN_S) htattach $(DESTDIR)$(bindir)/htdetach
 	rm -f            $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg
 	$(LN_S) hedgeytty_hitomi_bg $(DESTDIR)$(bindir)/hedgeytty-hitomi-bg
+	rm -f            $(DESTDIR)$(bindir)/hedgeytty-dock
+	$(LN_S) htdock $(DESTDIR)$(bindir)/hedgeytty-dock
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

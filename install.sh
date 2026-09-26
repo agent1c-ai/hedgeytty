@@ -290,7 +290,8 @@ install_user_rc() {
 
   mkdir -p "${HOME}/.config/hedgeytty"
   tmp=$(mktemp)
-  sed "s|Exec \"hedgeytty-hitomi-bg\"|Exec \"$BIN_DIR/hedgeytty-hitomi-bg\"|" \
+  sed -e "s|Exec \"hedgeytty-hitomi-bg\"|Exec \"$BIN_DIR/hedgeytty-hitomi-bg\"|" \
+      -e "s|Exec \"hedgeytty-dock\"|Exec \"$BIN_DIR/hedgeytty-dock\"|" \
     "$rc_src" >"$tmp"
   install -m 0644 "$tmp" "$rc_dist"
   if [[ ! -f "$rc_user" ]]; then
@@ -298,6 +299,12 @@ install_user_rc() {
     log "installed $rc_user"
   else
     log "keeping existing $rc_user (new default in hedgeyttyrc.dist)"
+    # Ensure dock autostart exists on upgrades (do not touch other customizations).
+    if ! grep -qE 'Exec[[:space:]]+".*hedgeytty-dock"' "$rc_user" 2>/dev/null; then
+      printf '\n# HedgeyTTY dock (added by installer)\nExec "%s/hedgeytty-dock"\n' \
+        "$BIN_DIR" >>"$rc_user"
+      log "appended hedgeytty-dock Exec to $rc_user"
+    fi
   fi
   rm -f "$tmp"
   printf '%s\n' "$PROFILE" >"${HOME}/.config/hedgeytty/profile"

@@ -92,8 +92,9 @@ Wire protocol stays Twin-compatible in spirit; on-disk and env names differ.
 | **gpm console mouse** | Documented in [`hedgeytty/docs/mouse.md`](hedgeytty/docs/mouse.md); installer runs `hedgeytty-setup-gpm` on **console** profile. |
 | **Socket + term modules on** | Clients (`htterm`, agents) can open windows without hunting the Modules menu. |
 | **Hitomi hedgehog desktop** | `hedgeytty-hitomi-bg` paints truecolor UTF-8 half-blocks via `libht` (Twin 1.0 twinrc/ANSI colors truncate Magenta→Blue). |
+| **App dock** | `hedgeytty-dock` — bind shell commands to slots; state in `~/.config/hedgeytty/dock.slots`. |
 | **TurboVision-style menus** | Always-visible menubar, left-click to open. |
-| **Windowless first boot** | No auto `ExecTty` — menubar + hedgehog only. |
+| **First boot** | No auto `ExecTty` — menubar + hedgehog wallpaper + dock. |
 | **pty profile** | Termux / macOS run in the current terminal via Twin’s xterm/termcap stack. |
 
 ## Layout
@@ -104,6 +105,7 @@ hedgeyttyrc                # package default RC (sysconfdir + user copy)
 htenvrc.sh
 assets/hitomi-icon.png
 clients/hitomi-bg.c        # hedgeytty-hitomi-bg
+clients/dock/              # hedgeytty-dock (modular: state / render / input / app)
 server/wrapper.c           # `hedgeytty` client → exec hedgeytty_server
 hedgeytty/
   scripts/setup-gpm.sh

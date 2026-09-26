@@ -45,6 +45,9 @@ Module "term" On
 # Hitomi hedgehog desktop (truecolor half-blocks via libtw).
 Exec "hedgeytty-hitomi-bg"
 
+# Bottom app dock (bind commands to slots; state in ~/.config/hedgeytty/dock.slots).
+Exec "hedgeytty-dock"
+
 #
 # create the common part of all menus
 #
@@ -383,13 +386,13 @@ Mouse H5   I  Scroll +0 +10
 # #
 
 
-# HedgeyTTY first boot: windowless desktop (menubar + wallpaper only).
-# Spawn a terminal later with Alt-Up, or File -> Execute / Modules.
+# HedgeyTTY first boot: menubar + wallpaper + dock (no auto terminal).
+# Spawn a terminal with Alt-Up, click a dock "+", or File -> Execute / Modules.
 # (Upstream Twin defaults to opening a maximized terminal here — we do not.)
 #
 # ExecTty "" ; Wait "Twin Term" ; Maximize
 
-# Module "socket" / "term" are enabled near the top (before Exec hitomi-bg).
+# Module "socket" / "term" are enabled near the top (before Exec hitomi-bg / dock).
 
 
 
