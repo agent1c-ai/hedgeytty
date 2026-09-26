@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # HedgeyTTY from-source installer — canonical entrypoint for:
-#   curl -fsSL https://agent1c.ai/tty.sh | sh
+#   curl -fsSL https://agent1c.ai/tty.sh | sh   # tty.sh invokes bash
+#   curl -fsSL .../install.sh | bash
+#
+# Requires bash (not dash). Piped `sh` ignores the shebang and breaks on `[[`.
+if [ -z "${BASH_VERSION:-}" ]; then
+  printf 'hedgeytty: ERROR: bash is required (try: curl ... | bash)\n' >&2
+  exit 1
+fi
+
 set -euo pipefail
 
 REPO_OWNER="${HEDGEYTTY_REPO_OWNER:-agent1c-ai}"

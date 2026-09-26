@@ -14,13 +14,13 @@ curl -fsSL https://agent1c.ai/tty.sh | sh
 ```
 
 `https://agent1c.ai/tty.sh` is a **thin redirect** into this repository’s
-[`install.sh`](install.sh). The installer builds from source into
-`~/.local` (build deps only — **not** the `twin` binary).
+[`install.sh`](install.sh) (it runs the installer under **bash**). The installer
+builds from source into `~/.local` (build deps only — **not** the `twin` binary).
 
 Equivalent:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/agent1c-ai/hedgeytty/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/agent1c-ai/hedgeytty/main/install.sh | bash
 ```
 
 Then on a **bare** Linux text console (not inside Twin / not on a pty):
