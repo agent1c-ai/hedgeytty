@@ -154,11 +154,12 @@ build_and_install() {
 
   mkdir -p "${HOME}/.config/hedgeytty" "${HOME}/.local/share/hedgeytty" \
            "${HOME}/.local/state/hedgeytty"
-  if [[ ! -f "${HOME}/.config/hedgeytty/hedgeyttyrc" ]]; then
-    install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc"
-  else
-    install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc.dist"
+  if [[ -f "${HOME}/.config/hedgeytty/hedgeyttyrc" ]]; then
+    cp -a "${HOME}/.config/hedgeytty/hedgeyttyrc" \
+      "${HOME}/.config/hedgeytty/hedgeyttyrc.bak"
   fi
+  install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc"
+  install -m 0644 "$SRC_DIR/hedgeyttyrc" "${HOME}/.config/hedgeytty/hedgeyttyrc.dist"
   [[ -f "${HOME}/.config/hedgeytty/htenvrc.sh" ]] || \
     install -m 0644 "$SRC_DIR/htenvrc.sh" "${HOME}/.config/hedgeytty/htenvrc.sh"
   install -m 0644 "$SRC_DIR/assets/hitomi-icon.png" \

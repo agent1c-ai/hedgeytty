@@ -200,11 +200,22 @@ int main(int argc, char **argv) {
   if (!ensure_icon(iconpath, sizeof iconpath))
     return 1;
 
-  if (!TwCheckMagic(hedgeytty_hitomi_magic) || !open_twin()) {
+  if (!TwCheckMagic(hedgeytty_hitomi_magic)) {
     err = TwErrno;
     fprintf(stderr, "hedgeytty-hitomi-bg: libtw error: %s%s\n", TwStrError(err),
             TwStrErrorDetail(err, TwErrnoDetail));
     return 1;
+  }
+  {
+    int tries;
+    for (tries = 0; tries < 50 && !open_twin(); tries++)
+      usleep(100000);
+    if (tries >= 50) {
+      err = TwErrno;
+      fprintf(stderr, "hedgeytty-hitomi-bg: libtw error: %s%s\n", TwStrError(err),
+              TwStrErrorDetail(err, TwErrnoDetail));
+      return 1;
+    }
   }
 
   scr = TwFirstScreen();

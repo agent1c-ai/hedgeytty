@@ -38,6 +38,10 @@ Background 1 White On Black (
    " "
 )
 
+# Socket must be up before clients (hitomi wallpaper, htterm, …).
+Module "socket" On
+Module "term" On
+
 # Hitomi hedgehog desktop (truecolor half-blocks via libtw).
 Exec "hedgeytty-hitomi-bg"
 
@@ -385,12 +389,7 @@ Mouse H5   I  Scroll +0 +10
 #
 # ExecTty "" ; Wait "Twin Term" ; Maximize
 
-# for all users too lazy to manually load the socket server from the menu:
-#
-Module "socket" On
-#
-# you may also want:
-Module "term" On
+# Module "socket" / "term" are enabled near the top (before Exec hitomi-bg).
 
 
 
