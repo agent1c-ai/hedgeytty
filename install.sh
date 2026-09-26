@@ -131,18 +131,17 @@ build_and_install() {
   log "configure --prefix=$PREFIX"
   ./configure --prefix="$PREFIX" \
     --enable-socket \
-    --enable-term \
     --enable-hw-tty \
-    --disable-ttlib \
+    --enable-hw-tty-linux \
     --disable-hw-x11 \
     --disable-hw-xft
   log "make -j$JOBS"
   if command -v lab-run >/dev/null 2>&1; then
-    lab-run -- make -j"$JOBS"
-    lab-run -- make install
+    lab-run -- make -j"$JOBS" || die "build failed or refused by lab-run (free RAM / wait)"
+    lab-run -- make install || die "make install failed or refused by lab-run"
   else
-    make -j"$JOBS"
-    make install
+    make -j"$JOBS" || die "make failed"
+    make install || die "make install failed"
   fi
 
   # The real client is the ELF built from server/wrapper.c (execs hedgeytty_server).
