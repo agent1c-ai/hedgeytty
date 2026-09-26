@@ -6,12 +6,17 @@
  *  Also:
  *   - refuses to steal a console already owned by Twin/HedgeyTTY
  *     (nested start + Quit leaves the outer session broken)
+ *   - reclaims orphaned servers (no controlling tty) left after crashes
+ *     or detached --nohw runs, so a stale socket cannot brick startup
  *   - redirects stderr to a state log so server chatter does not paint
  *     over the menubar on the Linux console
  */
 
+#define _GNU_SOURCE
+
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -53,11 +58,79 @@ static int env_truthy(const char *name) {
   return v && v[0] == '1' && v[1] == '\0';
 }
 
-/* True if a live server is accepting on path; unlinks stale sockets. */
-static int live_server_sock(const char *path) {
+/* Linux /proc/<pid>/stat field tty_nr; 0 = no controlling terminal. -1 on error. */
+static int proc_tty_nr(pid_t pid) {
+  char path[64], buf[512];
+  char *rp;
+  int fd, n, tty = -1;
+  char state;
+
+  if (pid <= 0)
+    return -1;
+  snprintf(path, sizeof path, "/proc/%d/stat", (int)pid);
+  fd = open(path, O_RDONLY);
+  if (fd < 0)
+    return -1;
+  n = (int)read(fd, buf, sizeof buf - 1);
+  close(fd);
+  if (n <= 0)
+    return -1;
+  buf[n] = '\0';
+  rp = strrchr(buf, ')');
+  if (!rp || rp[1] != ' ')
+    return -1;
+  /* after ") ": state ppid pgrp session tty_nr */
+  if (sscanf(rp + 2, "%c %*d %*d %*d %d", &state, &tty) != 2)
+    return -1;
+  return tty;
+}
+
+static pid_t sock_peer_pid(int fd) {
+  struct ucred cr;
+  socklen_t len = sizeof cr;
+
+  memset(&cr, 0, sizeof cr);
+  if (getsockopt(fd, SOL_SOCKET, SO_PEERCRED, &cr, &len) != 0)
+    return (pid_t)-1;
+  return cr.pid;
+}
+
+static void reclaim_server(const char *path, pid_t peer) {
+  char msg[160];
+  int i;
+
+  if (peer > 1) {
+    snprintf(msg, sizeof msg, "reclaiming orphaned server (pid %d).", (int)peer);
+    say(msg);
+    (void)kill(peer, SIGTERM);
+    for (i = 0; i < 40; i++) {
+      if (kill(peer, 0) != 0)
+        break;
+      usleep(50000);
+    }
+    if (kill(peer, 0) == 0)
+      (void)kill(peer, SIGKILL);
+  }
+  unlink(path);
+}
+
+/*
+ * Connect to path. Returns:
+ *   0  — free (missing or stale; stale unlinked)
+ *   1  — live server we must not displace (same console)
+ *  -1  — live but reclaimed / other tty (caller may proceed)
+ *
+ * out_peer: peer pid when connected, else -1.
+ */
+static int probe_server_sock(const char *path, pid_t *out_peer) {
   struct stat st;
   struct sockaddr_un addr;
   int fd, connected;
+  pid_t peer = (pid_t)-1;
+  int our_tty, peer_tty;
+
+  if (out_peer)
+    *out_peer = (pid_t)-1;
 
   if (lstat(path, &st) != 0)
     return 0;
@@ -79,13 +152,39 @@ static int live_server_sock(const char *path) {
   addr.sun_family = AF_UNIX;
   strncpy(addr.sun_path, path, sizeof addr.sun_path - 1);
   connected = connect(fd, (struct sockaddr *)&addr, sizeof addr) == 0;
+  if (connected)
+    peer = sock_peer_pid(fd);
   close(fd);
 
   if (!connected) {
     unlink(path); /* stale after crash / nested Quit */
     return 0;
   }
-  return 1;
+
+  if (out_peer)
+    *out_peer = peer;
+
+  our_tty = proc_tty_nr(getpid());
+  peer_tty = proc_tty_nr(peer);
+
+  /* Orphan: holds the socket but has no console (crash / --nohw leftover). */
+  if (peer > 1 && peer_tty == 0) {
+    reclaim_server(path, peer);
+    return -1;
+  }
+
+  /*
+   * Only refuse when the live server owns *our* console. A session on
+   * another tty (or when we have no CTTY) must not brick startup forever.
+   */
+  if (our_tty > 0 && peer_tty == our_tty)
+    return 1;
+
+  /* Connected but cannot identify peer — do not displace blindly. */
+  if (peer <= 1)
+    return 1;
+
+  return -1;
 }
 
 /*
@@ -102,16 +201,16 @@ static int refuse_nested_console(void) {
 
   for (i = 0; i < 8; i++) {
     snprintf(path, sizeof path, "/tmp/.Twin:%d", i);
-    if (live_server_sock(path)) {
-      say("refusing to start — apt Twin already running.");
+    if (probe_server_sock(path, NULL) == 1) {
+      say("refusing to start — apt Twin already running on this console.");
       say("Quit Twin (File → Quit), then run hedgeytty on the bare console.");
       return 1;
     }
   }
   for (i = 0; i < 8; i++) {
     snprintf(path, sizeof path, "/tmp/.HedgeyTTY:%d", i);
-    if (live_server_sock(path)) {
-      say("refusing to start — HedgeyTTY already running.");
+    if (probe_server_sock(path, NULL) == 1) {
+      say("refusing to start — HedgeyTTY already running on this console.");
       say("Quit that session first (File → Quit).");
       return 1;
     }
